@@ -1,0 +1,87 @@
+╔══════════════════════════════════════════════════════════════════════╗
+║                                                                      ║
+║         SAM.gov Contracting Opportunities App - READY!              ║
+║                                                                      ║
+║  ✅ Supabase configured                                             ║
+║  ✅ SAM.gov API key working                                         ║
+║  ✅ All dependencies installed                                      ║
+║                                                                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+📋 2 STEPS TO START:
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ STEP 1: Create Database Tables (ONE TIME - 2 minutes)              │
+└─────────────────────────────────────────────────────────────────────┘
+
+1. Open this URL in your browser:
+   https://supabase.com/dashboard/project/dtcwjaunekcbnrtshgok/sql/new
+
+2. Open this file:
+   server\setup-database.sql
+
+3. Copy ALL the SQL from that file
+
+4. Paste into Supabase SQL Editor
+
+5. Click "RUN" button (or press Ctrl+Enter)
+
+6. You should see: "Database setup completed successfully!" ✅
+
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ STEP 2: Start the Application                                      │
+└─────────────────────────────────────────────────────────────────────┘
+
+Open a terminal in this directory and run:
+
+   npm run dev
+
+The app will start on:
+   → Backend:  http://localhost:3001
+   → Frontend: http://localhost:3000
+
+Open your browser to: http://localhost:3000
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 TRY IT OUT:
+
+1. Search Page:
+   - Enter NAICS code: 541330
+   - Select: "Last 30 days"
+   - Click "Search Opportunities"
+
+2. Save opportunities you like
+
+3. Set up email notifications (Notifications tab)
+
+4. Export results to CSV or Excel
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 MORE INFO:
+
+→ Quick Start Guide: QUICKSTART.md
+→ Full Documentation: README.md
+→ Setup Details: SUPABASE_SETUP_COMPLETE.md
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 OPTIONAL: Email Notifications
+
+To enable email notifications, edit: server\.env
+
+Add your Gmail credentials:
+   EMAIL_USER=your-email@gmail.com
+   EMAIL_PASSWORD=your-gmail-app-password
+
+(Use a Gmail App Password, not your regular password)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+That's it! Ready to search government contracting opportunities! 🚀

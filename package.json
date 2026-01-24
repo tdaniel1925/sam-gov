@@ -1,0 +1,23 @@
+{
+  "name": "sam-opportunities-app",
+  "version": "1.0.0",
+  "description": "SAM.gov Contracting Opportunities Search Application",
+  "private": true,
+  "scripts": {
+    "install": "npm install --prefix server && npm install --prefix client",
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "build": "npm run build --prefix server && npm run build --prefix client",
+    "start:server": "npm start --prefix server",
+    "start:client": "npm run preview --prefix client",
+    "test": "npm test --prefix server",
+    "db:generate": "npm run db:generate --prefix server",
+    "db:migrate": "npm run db:migrate --prefix server",
+    "db:studio": "npm run db:studio --prefix server"
+  },
+  "keywords": ["sam.gov", "contracting", "opportunities", "government"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
