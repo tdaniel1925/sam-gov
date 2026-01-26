@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Opportunity } from '../types/opportunity';
 
 // Mock data that looks like real SAM.gov opportunities
 const mockOpportunities = [
@@ -55,7 +56,7 @@ const mockOpportunities = [
 ];
 
 export default function MockSearchPage() {
-  const [opportunities, setOpportunities] = useState([]);
+  const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [loading, setLoading] = useState(false);
 
   const loadMockOpportunities = async () => {

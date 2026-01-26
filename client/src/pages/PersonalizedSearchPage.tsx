@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import AuthForms from '../components/Auth/AuthForms'
+import { Opportunity } from '../types/opportunity'
 
 // Mock data that looks like real SAM.gov opportunities
 const mockOpportunities = [
@@ -88,8 +89,8 @@ const mockOpportunities = [
 
 export default function PersonalizedSearchPage() {
   const { user, profile, signOut, loading: authLoading } = useAuth()
-  const [opportunities, setOpportunities] = useState([])
-  const [filteredOpportunities, setFilteredOpportunities] = useState([])
+  const [opportunities, setOpportunities] = useState<Opportunity[]>([])
+  const [filteredOpportunities, setFilteredOpportunities] = useState<Opportunity[]>([])
   const [loading, setLoading] = useState(false)
   const [showAll, setShowAll] = useState(false)
 
