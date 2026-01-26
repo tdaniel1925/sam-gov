@@ -20,6 +20,7 @@ import documentationRoutes from './routes/documentation';
 import authRoutes from './routes/auth';
 import subscriptionsRoutes from './routes/subscriptions';
 import webhooksRoutes from './routes/webhooks';
+import alertsRoutes from './routes/alerts';
 import { NotificationJob } from './services/notification-job';
 import { OpportunityMonitor } from './services/opportunity-monitor';
 
@@ -65,6 +66,7 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/opportunities', opportunitiesRoutes);
 app.use('/api/chat', chatbotRoutes);
 app.use('/api/documentation', documentationRoutes);
+app.use('/api/alerts', alertsRoutes);
 
 // 404 handler
 app.use((req, res) => {

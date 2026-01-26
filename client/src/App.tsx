@@ -142,8 +142,11 @@ function App() {
               }
             />
 
+            {/* Public Search Route - for testing */}
+            <Route path="/public-search" element={<SearchPage />} />
+
             {/* Default route - redirect to dashboard */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/" element={<Navigate to="/public-search" replace />} />
 
             {/* 404 - redirect to dashboard */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />

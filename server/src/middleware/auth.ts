@@ -1,95 +1,110 @@
 // =============================================================================
 // AUTHENTICATION MIDDLEWARE
 // Following CodeBakers pattern 02-auth.md
-// Protects routes by verifying Supabase JWT tokens
 // =============================================================================
 
 import { Request, Response, NextFunction } from 'express';
-import { verifySession } from '../lib/supabase';
-import { User as SupabaseUser } from '@supabase/supabase-js';
+import jwt from 'jsonwebtoken';
 
-// Extend Express Request to include user
-declare global {
-  namespace Express {
-    interface Request {
-      user?: SupabaseUser;
-    }
-  }
+export interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    email: string;
+    teamId?: string;
+    subscriptionTier?: 'professional' | 'business' | 'enterprise';
+  };
 }
 
-/**
- * Middleware to require authentication
- * Verifies JWT token from Authorization header
- */
-export async function requireAuth(
-  req: Request,
+export const requireAuth = async (
+  req: AuthRequest,
   res: Response,
   next: NextFunction
-): Promise<void> {
+) => {
   try {
-    // Get token from Authorization header
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      res.status(401).json({
-        error: 'Unauthorized',
-        code: 'MISSING_TOKEN',
-        message: 'No authentication token provided',
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({
+        error: 'Authentication required',
+        code: 'UNAUTHORIZED'
       });
-      return;
     }
 
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-
-    // Verify token with Supabase
-    const { valid, user } = await verifySession(token);
-
-    if (!valid || !user) {
-      res.status(401).json({
-        error: 'Unauthorized',
-        code: 'INVALID_TOKEN',
-        message: 'Invalid or expired authentication token',
-      });
-      return;
-    }
-
-    // Attach user to request
-    req.user = user;
-
+    // Verify JWT token
+    const secret = process.env.JWT_SECRET || 'fallback-secret-for-development';
+    const decoded = jwt.verify(token, secret) as any;
+    
+    req.user = {
+      id: decoded.id || decoded.sub,
+      email: decoded.email,
+      teamId: decoded.teamId,
+      subscriptionTier: decoded.subscriptionTier
+    };
+    
     next();
   } catch (error) {
     console.error('Auth middleware error:', error);
-    res.status(500).json({
-      error: 'Internal server error',
-      code: 'AUTH_ERROR',
+    res.status(401).json({
+      error: 'Invalid or expired token',
+      code: 'INVALID_TOKEN'
     });
   }
-}
+};
 
-/**
- * Optional auth - doesn't fail if no token, but attaches user if present
- */
-export async function optionalAuth(
-  req: Request,
-  _res: Response,
-  next: NextFunction
-): Promise<void> {
-  try {
-    const authHeader = req.headers.authorization;
-
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.substring(7);
-      const { valid, user } = await verifySession(token);
-
-      if (valid && user) {
-        req.user = user;
+export const requireSubscription = (minTier?: 'professional' | 'business' | 'enterprise') => {
+  return async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({
+          error: 'Authentication required',
+          code: 'UNAUTHORIZED'
+        });
       }
+
+      // For development, allow all requests
+      if (process.env.NODE_ENV === 'development') {
+        return next();
+      }
+
+      // TODO: Implement subscription tier checking
+      // Check if user has active subscription and meets minimum tier requirement
+      
+      next();
+    } catch (error) {
+      console.error('Subscription middleware error:', error);
+      res.status(403).json({
+        error: 'Subscription required',
+        code: 'SUBSCRIPTION_REQUIRED'
+      });
+    }
+  };
+};
+
+export const requireAdminRole = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Authentication required',
+        code: 'UNAUTHORIZED'
+      });
+    }
+
+    // TODO: Check if user has admin role in their team
+    // For now, allow in development
+    if (process.env.NODE_ENV === 'development') {
+      return next();
     }
 
     next();
   } catch (error) {
-    // Don't fail on optional auth errors
-    console.error('Optional auth error:', error);
-    next();
+    console.error('Admin role middleware error:', error);
+    res.status(403).json({
+      error: 'Admin role required',
+      code: 'ADMIN_REQUIRED'
+    });
   }
-}
+};

@@ -14,10 +14,19 @@
     "db:migrate": "npm run db:migrate --prefix server",
     "db:studio": "npm run db:studio --prefix server"
   },
-  "keywords": ["sam.gov", "contracting", "opportunities", "government"],
+  "keywords": [
+    "sam.gov",
+    "contracting",
+    "opportunities",
+    "government"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.91.1",
+    "pg": "^8.17.2"
   }
 }

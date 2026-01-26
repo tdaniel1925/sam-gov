@@ -50,3 +50,5 @@ coverage/
 Thumbs.db
 .DS_Store
 nul
+.vercel
+.env*.local

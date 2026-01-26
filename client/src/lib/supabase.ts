@@ -1,26 +1,32 @@
-// =============================================================================
-// SUPABASE CLIENT (Frontend)
-// Following CodeBakers pattern 02-auth.md
-// Browser-side Supabase authentication
-// =============================================================================
+import { createClient } from '@supabase/supabase-js'
 
-import { createClient } from '@supabase/supabase-js';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl) {
-  throw new Error('Missing VITE_SUPABASE_URL environment variable');
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables')
 }
 
-if (!supabaseAnonKey) {
-  throw new Error('Missing VITE_SUPABASE_ANON_KEY environment variable');
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+// Database types
+export interface UserProfile {
+  id: string
+  email: string
+  company_name?: string
+  naics_codes: string[] // Array of NAICS codes user is interested in
+  created_at: string
+  updated_at: string
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-  },
-});
+export interface SavedOpportunity {
+  id: string
+  user_id: string
+  notice_id: string
+  title: string
+  solicitation_number: string
+  naics_code: string
+  posted_date: string
+  deadline?: string
+  saved_at: string
+}
