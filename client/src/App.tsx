@@ -15,6 +15,7 @@ import SearchPage from './pages/SearchPage';
 import SavedPage from './pages/SavedPage';
 import NotificationsPage from './pages/NotificationsPage';
 import ProfilePage from './pages/ProfilePage';
+import SimpleApp from './SimpleApp';
 
 // =============================================================================
 // PROTECTED ROUTE COMPONENT
@@ -67,6 +68,15 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  // Check if we're in demo mode or if backend is not available
+  const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
+  const isBackendAvailable = import.meta.env.VITE_BACKEND_AVAILABLE !== 'false';
+
+  // If demo mode or no backend, show simple app
+  if (isDemoMode || !isBackendAvailable) {
+    return <SimpleApp />;
+  }
+
   return (
     <AuthProvider>
       <Router>
