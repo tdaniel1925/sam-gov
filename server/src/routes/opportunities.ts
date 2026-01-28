@@ -11,6 +11,8 @@ import { discoveredOpportunities, companyProfile } from '../db/schema';
 import { eq, and, desc } from 'drizzle-orm';
 import { OpportunityMonitor } from '../services/opportunity-monitor';
 import { AIScoringService } from '../services/ai-scoring-service';
+import { AISummarizationService } from '../services/ai-summarization-service';
+import { ProposalGenerationService } from '../services/proposal-generation-service';
 import { requireAuth } from '../middleware/auth';
 
 const router = Router();
@@ -205,6 +207,154 @@ router.post('/score', async (req: Request, res: Response) => {
         res,
         error.message,
         'SCORE_ERROR',
+        500
+      );
+    }
+
+    return errorResponse(
+      res,
+      'Internal server error',
+      'INTERNAL_ERROR',
+      500
+    );
+  }
+});
+
+// POST /api/opportunities/summarize - Generate comprehensive AI summary
+router.post('/summarize', async (req: Request, res: Response) => {
+  try {
+    const opportunity = req.body.opportunity;
+
+    if (!opportunity) {
+      return errorResponse(
+        res,
+        'Opportunity data is required',
+        'MISSING_OPPORTUNITY',
+        400
+      );
+    }
+
+    // Generate comprehensive summary
+    const summary = await AISummarizationService.summarizeOpportunity(opportunity);
+
+    return res.json({
+      summary,
+      success: true,
+    });
+
+  } catch (error) {
+    if (error instanceof Error) {
+      return errorResponse(
+        res,
+        error.message,
+        'SUMMARIZE_ERROR',
+        500
+      );
+    }
+
+    return errorResponse(
+      res,
+      'Internal server error',
+      'INTERNAL_ERROR',
+      500
+    );
+  }
+});
+
+// POST /api/opportunities/generate-proposal - Generate proposal outline
+router.post('/generate-proposal', async (req: Request, res: Response) => {
+  try {
+    const { opportunity, summary } = req.body;
+
+    if (!opportunity) {
+      return errorResponse(
+        res,
+        'Opportunity data is required',
+        'MISSING_OPPORTUNITY',
+        400
+      );
+    }
+
+    // Fetch company profile
+    const profiles = await db.select().from(companyProfile).limit(1);
+    const profile = profiles.length > 0 ? profiles[0] : null;
+
+    if (!profile) {
+      return errorResponse(
+        res,
+        'Company profile required for proposal generation. Please complete your profile first.',
+        'MISSING_PROFILE',
+        400
+      );
+    }
+
+    // Generate summary if not provided
+    let opportunitySummary = summary;
+    if (!opportunitySummary) {
+      opportunitySummary = await AISummarizationService.summarizeOpportunity(opportunity);
+    }
+
+    // Generate proposal outline
+    const proposalOutline = await ProposalGenerationService.generateProposalOutline(
+      opportunity,
+      opportunitySummary,
+      profile
+    );
+
+    return res.json({
+      proposalOutline,
+      success: true,
+    });
+
+  } catch (error) {
+    if (error instanceof Error) {
+      return errorResponse(
+        res,
+        error.message,
+        'PROPOSAL_GENERATION_ERROR',
+        500
+      );
+    }
+
+    return errorResponse(
+      res,
+      'Internal server error',
+      'INTERNAL_ERROR',
+      500
+    );
+  }
+});
+
+// POST /api/opportunities/compliance-matrix - Generate detailed compliance matrix
+router.post('/compliance-matrix', async (req: Request, res: Response) => {
+  try {
+    const { opportunityDescription } = req.body;
+
+    if (!opportunityDescription) {
+      return errorResponse(
+        res,
+        'Opportunity description is required',
+        'MISSING_DESCRIPTION',
+        400
+      );
+    }
+
+    // Generate detailed compliance matrix
+    const complianceMatrix = await ProposalGenerationService.generateDetailedComplianceMatrix(
+      opportunityDescription
+    );
+
+    return res.json({
+      complianceMatrix,
+      success: true,
+    });
+
+  } catch (error) {
+    if (error instanceof Error) {
+      return errorResponse(
+        res,
+        error.message,
+        'COMPLIANCE_MATRIX_ERROR',
         500
       );
     }

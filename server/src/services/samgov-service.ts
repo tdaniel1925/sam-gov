@@ -25,7 +25,7 @@ export class SAMGovService {
       throw new Error('Date range cannot exceed 1 year');
     }
 
-    // Build query parameters
+    // Build query parameters (only include non-empty values)
     const queryParams: Record<string, string> = {
       postedFrom: params.postedFrom,
       postedTo: params.postedTo,
@@ -33,16 +33,65 @@ export class SAMGovService {
       offset: String(params.offset || 0),
     };
 
+    // NAICS code filter
     if (params.ncode) {
-      // Validate NAICS code (max 6 digits)
       if (!/^\d{1,6}$/.test(params.ncode)) {
         throw new Error('NAICS code must be 1-6 digits');
       }
       queryParams.ncode = params.ncode;
     }
 
+    // Procurement type (o=solicitation, p=presolicitation, etc.)
     if (params.ptype) {
       queryParams.ptype = params.ptype;
+    }
+
+    // Solicitation number
+    if (params.solicitationNumber) {
+      queryParams.solnum = params.solicitationNumber;
+    }
+
+    // Notice ID
+    if (params.noticeId) {
+      queryParams.noticeid = params.noticeId;
+    }
+
+    // Location filters
+    if (params.state) {
+      queryParams.state = params.state.toUpperCase();
+    }
+
+    if (params.zip) {
+      queryParams.zip = params.zip;
+    }
+
+    // Organization/agency name
+    if (params.organizationName) {
+      queryParams.orgname = params.organizationName;
+    }
+
+    // Set-aside code (SBA, WOSB, SDVOSB, etc.)
+    if (params.setAside) {
+      queryParams.typeOfSetAside = params.setAside;
+    }
+
+    // Classification code (PSC)
+    if (params.classificationCode) {
+      queryParams.psc = params.classificationCode;
+    }
+
+    // Response deadline range
+    if (params.responseDeadlineFrom) {
+      queryParams.rdlfrom = params.responseDeadlineFrom;
+    }
+
+    if (params.responseDeadlineTo) {
+      queryParams.rdlto = params.responseDeadlineTo;
+    }
+
+    // Keywords (full-text search)
+    if (params.keywords) {
+      queryParams.q = params.keywords;
     }
 
     return samRequest<OpportunitySearchResponse>('/search', {

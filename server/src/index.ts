@@ -21,6 +21,8 @@ import authRoutes from './routes/auth';
 import subscriptionsRoutes from './routes/subscriptions';
 import webhooksRoutes from './routes/webhooks';
 import alertsRoutes from './routes/alerts';
+import contentBlocksRoutes from './routes/content-blocks';
+import savedSearchesRoutes from './routes/saved-searches';
 import { NotificationJob } from './services/notification-job';
 import { OpportunityMonitor } from './services/opportunity-monitor';
 
@@ -60,6 +62,8 @@ app.use('/api/subscriptions', subscriptionsRoutes);
 app.use('/api/webhooks', webhooksRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/saved', savedRoutes);
+app.use('/api/saved-searches', savedSearchesRoutes);
+app.use('/api/content-blocks', contentBlocksRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/export', exportRoutes);
 app.use('/api/profile', profileRoutes);

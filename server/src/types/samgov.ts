@@ -4,12 +4,31 @@
 // =============================================================================
 
 export interface OpportunitySearchParams {
+  // Date filters (postedFrom is mandatory per SAM.gov API)
+  postedFrom: string; // MM/DD/YYYY (mandatory)
+  postedTo: string; // MM/DD/YYYY (mandatory)
+
+  // Core filters
   ncode?: string; // NAICS code (6 digits)
-  postedFrom: string; // MM/DD/YYYY
-  postedTo: string; // MM/DD/YYYY
-  limit?: number; // Max 1000
-  offset?: number; // Page offset
-  ptype?: string; // Procurement type
+  ptype?: string; // Procurement type (e.g., 'o' for solicitation, 'p' for presolicitation)
+
+  // Advanced filters from requirements
+  solicitationNumber?: string; // Solicitation number
+  noticeId?: string; // Notice ID
+  state?: string; // State code (e.g., 'TX')
+  zip?: string; // Zip code
+  organizationName?: string; // Organization/agency name
+  setAside?: string; // Set-aside code (e.g., 'SBA', 'WOSB', 'SDVOSB')
+  classificationCode?: string; // Product Service Code (PSC)
+  responseDeadlineFrom?: string; // MM/DD/YYYY
+  responseDeadlineTo?: string; // MM/DD/YYYY
+
+  // Pagination
+  limit?: number; // Max 1000, default 10
+  offset?: number; // Page offset for pagination
+
+  // Keywords (full-text search)
+  keywords?: string; // Free-text keyword search
 }
 
 export interface Opportunity {

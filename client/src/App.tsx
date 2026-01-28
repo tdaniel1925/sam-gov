@@ -15,6 +15,9 @@ import SearchPage from './pages/SearchPage';
 import SavedPage from './pages/SavedPage';
 import NotificationsPage from './pages/NotificationsPage';
 import ProfilePage from './pages/ProfilePage';
+import AdvancedSearchPage from './pages/AdvancedSearchPage';
+import OpportunityDetailPage from './pages/OpportunityDetailPage';
+import ProposalGeneratorPage from './pages/ProposalGeneratorPage';
 import SimpleApp from './SimpleApp';
 
 // =============================================================================
@@ -148,6 +151,30 @@ function App() {
               element={
                 <ProtectedRoute>
                   <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/advanced-search"
+              element={
+                <ProtectedRoute>
+                  <AdvancedSearchPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/opportunity-detail"
+              element={
+                <ProtectedRoute>
+                  <OpportunityDetailPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/proposal-generator"
+              element={
+                <ProtectedRoute>
+                  <ProposalGeneratorPage />
                 </ProtectedRoute>
               }
             />

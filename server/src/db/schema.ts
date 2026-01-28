@@ -445,6 +445,58 @@ export type NewDiscoveredOpportunity = typeof discoveredOpportunities.$inferInse
 export type CompanyProfile = typeof companyProfile.$inferSelect;
 export type NewCompanyProfile = typeof companyProfile.$inferInsert;
 
+// Content Blocks Table (for proposal reusable content)
+export const contentBlocks = pgTable('content_blocks', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id'), // References users.id, null for team-wide content
+  teamId: uuid('team_id'), // References teams.id
+  category: text('category').notNull(), // 'company-overview', 'quality-control', 'risk-management', etc.
+  title: text('title').notNull(),
+  content: text('content').notNull(),
+  tags: jsonb('tags').$type<string[]>(),
+  isShared: boolean('is_shared').default(false).notNull(), // Shared across team
+  usageCount: integer('usage_count').default(0).notNull(),
+  lastUsed: timestamp('last_used'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: index('content_blocks_user_id_idx').on(table.userId),
+  teamIdIdx: index('content_blocks_team_id_idx').on(table.teamId),
+  categoryIdx: index('content_blocks_category_idx').on(table.category),
+}));
+
+// Saved Searches Table (for alerts and quick access)
+export const savedSearches = pgTable('saved_searches', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull(), // References users.id
+  name: text('name').notNull(), // User-friendly name
+  description: text('description'),
+
+  // Search parameters (stored as JSONB for flexibility)
+  searchParams: jsonb('search_params').$type<{
+    naicsCode?: string;
+    procurementType?: string;
+    state?: string;
+    setAside?: string;
+    keywords?: string;
+    [key: string]: any;
+  }>().notNull(),
+
+  // Alert settings
+  alertEnabled: boolean('alert_enabled').default(false).notNull(),
+  alertFrequency: notificationFrequencyEnum('alert_frequency').default('daily'),
+  lastAlertSent: timestamp('last_alert_sent'),
+
+  // Metadata
+  lastRun: timestamp('last_run'),
+  resultCount: integer('result_count').default(0).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: index('saved_searches_user_id_idx').on(table.userId),
+  alertEnabledIdx: index('saved_searches_alert_enabled_idx').on(table.alertEnabled),
+}));
+
 // Types - SaaS Tables
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -481,3 +533,9 @@ export type NewWebhook = typeof webhooks.$inferInsert;
 
 export type Integration = typeof integrations.$inferSelect;
 export type NewIntegration = typeof integrations.$inferInsert;
+
+export type ContentBlock = typeof contentBlocks.$inferSelect;
+export type NewContentBlock = typeof contentBlocks.$inferInsert;
+
+export type SavedSearch = typeof savedSearches.$inferSelect;
+export type NewSavedSearch = typeof savedSearches.$inferInsert;
