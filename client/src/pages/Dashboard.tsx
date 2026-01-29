@@ -1,3 +1,4 @@
+import { API_URL } from "../config/api";
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import Button from '../components/UI/Button'
@@ -34,7 +35,7 @@ export default function Dashboard() {
     setLoading(true)
     try {
       // This would call your real API
-      const response = await fetch('http://localhost:3001/api/search/recent')
+      const response = await fetch(API_URL + '/search/recent')
       if (response.ok) {
         const result = await response.json()
         if (result.data?.opportunitiesData) {
@@ -56,7 +57,7 @@ export default function Dashboard() {
 
   const loadAlerts = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/alerts')
+      const response = await fetch(API_URL + '/alerts')
       if (response.ok) {
         const result = await response.json()
         if (result.data) {
@@ -72,7 +73,7 @@ export default function Dashboard() {
     if (!newAlertForm.name || newAlertForm.naics_codes.length === 0) return
 
     try {
-      const response = await fetch('http://localhost:3001/api/alerts', {
+      const response = await fetch(API_URL + '/alerts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -97,7 +98,7 @@ export default function Dashboard() {
       const alert = alerts.find(a => a.id === alertId)
       if (!alert) return
 
-      const response = await fetch(`http://localhost:3001/api/alerts/${alertId}`, {
+      const response = await fetch(`${API_URL}/alerts/${alertId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -117,7 +118,7 @@ export default function Dashboard() {
 
   const deleteAlert = async (alertId: string) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/alerts/${alertId}`, {
+      const response = await fetch(`${API_URL}/alerts/${alertId}`, {
         method: 'DELETE'
       })
 

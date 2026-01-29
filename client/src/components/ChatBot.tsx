@@ -1,3 +1,4 @@
+import { API_URL } from "../config/api";
 // =============================================================================
 // CHATBOT COMPONENT
 // Following CodeBakers pattern 04-frontend.md
@@ -41,7 +42,7 @@ export default function ChatBot() {
 
   const loadSuggestions = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/chat/suggestions');
+      const response = await fetch(API_URL + '/chat/suggestions');
       if (!response.ok) throw new Error('Failed to load suggestions');
       const data = await response.json();
       setSuggestions(data.suggestions);
@@ -65,7 +66,7 @@ export default function ChatBot() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3001/api/chat', {
+      const response = await fetch(API_URL + '/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

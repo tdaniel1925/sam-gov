@@ -1,3 +1,4 @@
+import { API_URL } from "../config/api";
 import { useState } from 'react';
 
 export default function SimpleSearchPage() {
@@ -10,7 +11,7 @@ export default function SimpleSearchPage() {
     setError('');
     
     try {
-      const response = await fetch('http://localhost:3001/api/search/recent');
+      const response = await fetch(API_URL + '/search/recent');
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

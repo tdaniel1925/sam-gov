@@ -1,3 +1,4 @@
+import { API_URL } from "../config/api";
 // =============================================================================
 // DOCUMENTATION PAGE
 // Following CodeBakers pattern 04-frontend.md
@@ -43,7 +44,7 @@ export default function DocumentationPage() {
 
   const loadCategories = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/documentation/categories');
+      const response = await fetch(API_URL + '/documentation/categories');
       if (!response.ok) throw new Error('Failed to load categories');
       const data = await response.json();
       setCategories(data.categories);
@@ -57,7 +58,7 @@ export default function DocumentationPage() {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:3001/api/documentation/category/${categoryId}`
+        `${API_URL}/documentation/category/${categoryId}`
       );
       if (!response.ok) throw new Error('Failed to load articles');
       const data = await response.json();
@@ -78,7 +79,7 @@ export default function DocumentationPage() {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:3001/api/documentation/article/${articleId}`
+        `${API_URL}/documentation/article/${articleId}`
       );
       if (!response.ok) throw new Error('Failed to load article');
       const data = await response.json();
@@ -101,7 +102,7 @@ export default function DocumentationPage() {
     setIsSearching(true);
     try {
       const response = await fetch(
-        `http://localhost:3001/api/documentation/search?q=${encodeURIComponent(query)}`
+        `${API_URL}/documentation/search?q=${encodeURIComponent(query)}`
       );
       if (!response.ok) throw new Error('Search failed');
       const data = await response.json();

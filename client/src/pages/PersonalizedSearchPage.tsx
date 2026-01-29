@@ -1,3 +1,4 @@
+import { API_URL } from "../config/api";
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import AuthForms from '../components/Auth/AuthForms'
@@ -110,7 +111,7 @@ export default function PersonalizedSearchPage() {
     try {
       if (useRealAPI) {
         // Try real API
-        const response = await fetch('http://localhost:3001/api/search/recent')
+        const response = await fetch(API_URL + '/search/recent')
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
