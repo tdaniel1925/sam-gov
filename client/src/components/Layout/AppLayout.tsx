@@ -15,6 +15,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     { path: '/advanced-search', label: 'Advanced Search' },
     { path: '/saved', label: 'Saved' },
     { path: '/notifications', label: 'Notifications' },
+    { path: '/help', label: 'Help' },
     { path: '/profile', label: 'Profile' },
   ]
 

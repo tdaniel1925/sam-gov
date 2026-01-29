@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard'
 import AdvancedSearchPage from './pages/AdvancedSearchPage'
 import SavedPage from './pages/SavedPage'
 import NotificationsPage from './pages/NotificationsPage'
+import HelpPage from './pages/HelpPage'
 import ProfilePage from './pages/ProfilePage'
 import OpportunityDetailPage from './pages/OpportunityDetailPage'
 
@@ -41,6 +42,7 @@ function ProfessionalApp() {
           <Route path="/opportunity/:id" element={<ProtectedRoute><OpportunityDetailPage /></ProtectedRoute>} />
           <Route path="/saved" element={<ProtectedRoute><SavedPage /></ProtectedRoute>} />
           <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
+          <Route path="/help" element={<ProtectedRoute><HelpPage /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
