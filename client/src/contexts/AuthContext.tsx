@@ -7,7 +7,7 @@ interface AuthContextType {
   profile: UserProfile | null
   session: Session | null
   loading: boolean
-  signUp: (email: string, password: string, companyName: string, naicsCodes: string[]) => Promise<{ error: any }>
+  signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<{ error: any }>
   signIn: (email: string, password: string) => Promise<{ error: any }>
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ error: any }>
@@ -91,10 +91,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const signUp = async (email: string, password: string, companyName: string, naicsCodes: string[]) => {
+  const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
+    // Sign up with user metadata that will be available in the welcome email
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+          full_name: `${firstName} ${lastName}`,
+        },
+        emailRedirectTo: `${window.location.origin}/dashboard`,
+      }
     })
 
     if (!error && data.user) {
@@ -104,8 +113,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .insert({
           id: data.user.id,
           email: email,
-          company_name: companyName,
-          naics_codes: naicsCodes,
+          company_name: `${firstName} ${lastName}`,
+          naics_codes: [],
         })
 
       if (profileError) {

@@ -13,10 +13,11 @@ import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 
 const signupSchema = z.object({
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   confirmPassword: z.string(),
-  fullName: z.string().min(1, 'Full name is required'),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ['confirmPassword'],
@@ -40,8 +41,8 @@ export default function SignupPage() {
   const onSubmit = async (data: SignupFormData) => {
     setIsLoading(true);
     try {
-      await signUp(data.email, data.password, data.fullName);
-      toast.success('Account created! Please check your email to verify.');
+      await signUp(data.email, data.password, data.firstName, data.lastName);
+      toast.success('Account created! Please check your email for a welcome message.');
       navigate('/dashboard');
     } catch (error: any) {
       toast.error(error.message || 'Failed to create account');
@@ -70,21 +71,40 @@ export default function SignupPage() {
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="rounded-md shadow-sm space-y-4">
-            <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
-                Full name
-              </label>
-              <input
-                {...register('fullName')}
-                id="fullName"
-                type="text"
-                autoComplete="name"
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="John Doe"
-              />
-              {errors.fullName && (
-                <p className="mt-1 text-sm text-red-600">{errors.fullName.message}</p>
-              )}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                  First name
+                </label>
+                <input
+                  {...register('firstName')}
+                  id="firstName"
+                  type="text"
+                  autoComplete="given-name"
+                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                  placeholder="John"
+                />
+                {errors.firstName && (
+                  <p className="mt-1 text-sm text-red-600">{errors.firstName.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                  Last name
+                </label>
+                <input
+                  {...register('lastName')}
+                  id="lastName"
+                  type="text"
+                  autoComplete="family-name"
+                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                  placeholder="Doe"
+                />
+                {errors.lastName && (
+                  <p className="mt-1 text-sm text-red-600">{errors.lastName.message}</p>
+                )}
+              </div>
             </div>
 
             <div>
