@@ -581,3 +581,251 @@ export type NewContentBlock = typeof contentBlocks.$inferInsert;
 
 export type SavedSearch = typeof savedSearches.$inferSelect;
 export type NewSavedSearch = typeof savedSearches.$inferInsert;
+
+//==============================================================================
+// PROPOSAL MAKER FEATURE - Database Schema
+//==============================================================================
+
+// Enums for Proposal Maker
+export const proposalStatusEnum = pgEnum('proposal_status', [
+  'draft',
+  'in_progress',
+  'under_review',
+  'submitted',
+  'won',
+  'lost',
+  'withdrawn',
+]);
+
+export const proposalSectionTypeEnum = pgEnum('proposal_section_type', [
+  'executive_summary',
+  'technical_approach',
+  'management_plan',
+  'staffing_plan',
+  'past_performance',
+  'cost_proposal',
+  'boe_narrative',
+  'custom',
+]);
+
+export const requirementTypeEnum = pgEnum('requirement_type', [
+  'mandatory',
+  'desired',
+  'optional',
+]);
+
+export const complianceStatusEnum = pgEnum('compliance_status', [
+  'addressed',
+  'partial',
+  'missing',
+  'not_applicable',
+]);
+
+export const bidDecisionEnum = pgEnum('bid_decision', [
+  'bid',
+  'no_bid',
+  'maybe',
+  'undecided',
+]);
+
+// Proposals Table
+export const proposals = pgTable('proposals', (table) => ({
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  opportunityId: text('opportunity_id'), // Reference to SAM.gov opportunity
+  title: text('title').notNull(),
+  solicitationNumber: text('solicitation_number'),
+  agencyName: text('agency_name'),
+  dueDate: timestamp('due_date'),
+  status: proposalStatusEnum('status').notNull().default('draft'),
+  winProbability: integer('win_probability'), // 0-100
+  estimatedValue: decimal('estimated_value', { precision: 15, scale: 2 }),
+  bidDecision: bidDecisionEnum('bid_decision'),
+  bidDecisionReasoning: text('bid_decision_reasoning'),
+  metadata: jsonb('metadata'), // Additional RFP data
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}), (table) => ({
+  userIdIdx: index('proposals_user_id_idx').on(table.userId),
+  statusIdx: index('proposals_status_idx').on(table.status),
+  dueDateIdx: index('proposals_due_date_idx').on(table.dueDate),
+}));
+
+// Proposal Sections Table
+export const proposalSections = pgTable('proposal_sections', (table) => ({
+  id: uuid('id').primaryKey().defaultRandom(),
+  proposalId: uuid('proposal_id').notNull().references(() => proposals.id, { onDelete: 'cascade' }),
+  sectionType: proposalSectionTypeEnum('section_type').notNull(),
+  title: text('title').notNull(),
+  content: text('content'), // Rich text content
+  order: integer('order').notNull().default(0),
+  pageLimit: integer('page_limit'),
+  wordCount: integer('word_count').default(0),
+  aiGenerated: boolean('ai_generated').default(false),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}), (table) => ({
+  proposalIdIdx: index('proposal_sections_proposal_id_idx').on(table.proposalId),
+  orderIdx: index('proposal_sections_order_idx').on(table.order),
+}));
+
+// Proposal Requirements Table
+export const proposalRequirements = pgTable('proposal_requirements', (table) => ({
+  id: uuid('id').primaryKey().defaultRandom(),
+  proposalId: uuid('proposal_id').notNull().references(() => proposals.id, { onDelete: 'cascade' }),
+  requirementText: text('requirement_text').notNull(),
+  requirementType: requirementTypeEnum('requirement_type').notNull(),
+  sectionReference: text('section_reference'), // e.g., "3.2.4", "SOW 2.1"
+  complianceStatus: complianceStatusEnum('compliance_status').default('missing'),
+  responseLocation: text('response_location'), // Where in proposal this is addressed
+  notes: text('notes'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}), (table) => ({
+  proposalIdIdx: index('proposal_requirements_proposal_id_idx').on(table.proposalId),
+  complianceStatusIdx: index('proposal_requirements_compliance_status_idx').on(table.complianceStatus),
+}));
+
+// Past Performance Projects Table
+export const pastPerformanceProjects = pgTable('past_performance_projects', (table) => ({
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  projectName: text('project_name').notNull(),
+  clientName: text('client_name').notNull(),
+  contractNumber: text('contract_number'),
+  contractValue: decimal('contract_value', { precision: 15, scale: 2 }),
+  startDate: timestamp('start_date'),
+  endDate: timestamp('end_date'),
+  description: text('description'),
+  outcomes: text('outcomes'),
+  referenceName: text('reference_name'),
+  referenceEmail: text('reference_email'),
+  referencePhone: text('reference_phone'),
+  relevanceTags: jsonb('relevance_tags'), // ["cloud", "cybersecurity", etc.]
+  performanceRating: text('performance_rating'), // "Exceptional", "Satisfactory", etc.
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}), (table) => ({
+  userIdIdx: index('past_performance_projects_user_id_idx').on(table.userId),
+}));
+
+// Team Members Table (for proposal staffing)
+export const proposalTeamMembers = pgTable('proposal_team_members', (table) => ({
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  title: text('title'),
+  resumeText: text('resume_text'),
+  certifications: jsonb('certifications'), // ["AWS SA", "PMP", etc.]
+  clearanceLevel: text('clearance_level'),
+  skills: jsonb('skills'), // ["Python", "AWS", "Leadership", etc.]
+  hourlyRate: decimal('hourly_rate', { precision: 10, scale: 2 }),
+  availability: boolean('availability').default(true),
+  photoUrl: text('photo_url'),
+  linkedinUrl: text('linkedin_url'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}), (table) => ({
+  userIdIdx: index('proposal_team_members_user_id_idx').on(table.userId),
+}));
+
+// Proposal Content Blocks (reusable content snippets)
+export const proposalContentBlocks = pgTable('proposal_content_blocks', (table) => ({
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  blockType: text('block_type').notNull(), // "company_overview", "capabilities", etc.
+  title: text('title').notNull(),
+  content: text('content').notNull(),
+  tags: jsonb('tags'),
+  usageCount: integer('usage_count').default(0),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}), (table) => ({
+  userIdIdx: index('proposal_content_blocks_user_id_idx').on(table.userId),
+  blockTypeIdx: index('proposal_content_blocks_block_type_idx').on(table.blockType),
+}));
+
+// Bid Decisions Table (AI analysis results)
+export const bidDecisions = pgTable('bid_decisions', (table) => ({
+  id: uuid('id').primaryKey().defaultRandom(),
+  proposalId: uuid('proposal_id').notNull().references(() => proposals.id, { onDelete: 'cascade' }),
+  recommendation: bidDecisionEnum('recommendation').notNull(),
+  confidenceLevel: integer('confidence_level'), // 0-100
+  winProbability: integer('win_probability'), // 0-100
+  pastPerformanceScore: integer('past_performance_score'), // 0-100
+  technicalCapabilityScore: integer('technical_capability_score'), // 0-100
+  resourceAvailabilityScore: integer('resource_availability_score'), // 0-100
+  competitiveLandscapeScore: integer('competitive_landscape_score'), // 0-100
+  strengths: jsonb('strengths'), // Array of strengths
+  weaknesses: jsonb('weaknesses'), // Array of weaknesses
+  risks: jsonb('risks'), // Array of risk factors
+  recommendations: jsonb('recommendations'), // Array of action items
+  estimatedCompetitors: integer('estimated_competitors'),
+  competitorNames: jsonb('competitor_names'),
+  analysisDate: timestamp('analysis_date').defaultNow().notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}), (table) => ({
+  proposalIdIdx: index('bid_decisions_proposal_id_idx').on(table.proposalId),
+}));
+
+// Capability Gaps Table (team capability analysis)
+export const capabilityGaps = pgTable('capability_gaps', (table) => ({
+  id: uuid('id').primaryKey().defaultRandom(),
+  proposalId: uuid('proposal_id').notNull().references(() => proposals.id, { onDelete: 'cascade' }),
+  requiredSkill: text('required_skill').notNull(),
+  criticality: text('criticality').notNull(), // "high", "medium", "low"
+  currentCoverage: boolean('current_coverage').default(false),
+  gapDescription: text('gap_description'),
+  recommendedAction: text('recommended_action'), // "hire", "train", "subcontract"
+  estimatedCost: decimal('estimated_cost', { precision: 10, scale: 2 }),
+  timeToFill: integer('time_to_fill'), // Days
+  notes: text('notes'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}), (table) => ({
+  proposalIdIdx: index('capability_gaps_proposal_id_idx').on(table.proposalId),
+}));
+
+// Proposal Cost Items Table
+export const proposalCostItems = pgTable('proposal_cost_items', (table) => ({
+  id: uuid('id').primaryKey().defaultRandom(),
+  proposalId: uuid('proposal_id').notNull().references(() => proposals.id, { onDelete: 'cascade' }),
+  category: text('category').notNull(), // "labor", "materials", "travel", "other"
+  description: text('description').notNull(),
+  quantity: decimal('quantity', { precision: 10, scale: 2 }),
+  unitCost: decimal('unit_cost', { precision: 10, scale: 2 }),
+  totalCost: decimal('total_cost', { precision: 15, scale: 2 }),
+  boeNarrative: text('boe_narrative'), // Basis of Estimate
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}), (table) => ({
+  proposalIdIdx: index('proposal_cost_items_proposal_id_idx').on(table.proposalId),
+}));
+
+// Types - Proposal Maker Tables
+export type Proposal = typeof proposals.$inferSelect;
+export type NewProposal = typeof proposals.$inferInsert;
+
+export type ProposalSection = typeof proposalSections.$inferSelect;
+export type NewProposalSection = typeof proposalSections.$inferInsert;
+
+export type ProposalRequirement = typeof proposalRequirements.$inferSelect;
+export type NewProposalRequirement = typeof proposalRequirements.$inferInsert;
+
+export type PastPerformanceProject = typeof pastPerformanceProjects.$inferSelect;
+export type NewPastPerformanceProject = typeof pastPerformanceProjects.$inferInsert;
+
+export type ProposalTeamMember = typeof proposalTeamMembers.$inferSelect;
+export type NewProposalTeamMember = typeof proposalTeamMembers.$inferInsert;
+
+export type ProposalContentBlock = typeof proposalContentBlocks.$inferSelect;
+export type NewProposalContentBlock = typeof proposalContentBlocks.$inferInsert;
+
+export type BidDecision = typeof bidDecisions.$inferSelect;
+export type NewBidDecision = typeof bidDecisions.$inferInsert;
+
+export type CapabilityGap = typeof capabilityGaps.$inferSelect;
+export type NewCapabilityGap = typeof capabilityGaps.$inferInsert;
+
+export type ProposalCostItem = typeof proposalCostItems.$inferSelect;
+export type NewProposalCostItem = typeof proposalCostItems.$inferInsert;

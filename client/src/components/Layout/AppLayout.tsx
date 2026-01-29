@@ -13,6 +13,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const navItems = [
     { path: '/dashboard', label: 'Dashboard' },
     { path: '/advanced-search', label: 'Advanced Search' },
+    { path: '/proposals', label: 'Proposals' },
     { path: '/saved', label: 'Saved' },
     { path: '/notifications', label: 'Notifications' },
     { path: '/coming-soon', label: 'Coming Soon' },

@@ -24,6 +24,13 @@ import alertsRoutes from './routes/alerts';
 import contentBlocksRoutes from './routes/content-blocks';
 import savedSearchesRoutes from './routes/saved-searches';
 import apiKeysRoutes from './routes/apiKeys';
+import proposalsRoutes from './routes/proposals';
+import proposalSectionsRoutes from './routes/proposal-sections';
+import pastPerformanceRoutes from './routes/past-performance';
+import proposalTeamRoutes from './routes/proposal-team';
+import samgovImportRoutes from './routes/samgov-import';
+import bidDecisionsRoutes from './routes/bid-decisions';
+import capabilityGapsRoutes from './routes/capability-gaps';
 import { NotificationJob } from './services/notification-job';
 import { OpportunityMonitor } from './services/opportunity-monitor';
 
@@ -96,6 +103,13 @@ app.use('/api/chat', chatbotRoutes);
 app.use('/api/documentation', documentationRoutes);
 app.use('/api/alerts', alertsRoutes);
 app.use('/api/api-keys', apiKeysRoutes);
+app.use('/api/proposals', proposalsRoutes);
+app.use('/api/proposal-sections', proposalSectionsRoutes);
+app.use('/api/past-performance', pastPerformanceRoutes);
+app.use('/api/proposal-team', proposalTeamRoutes);
+app.use('/api/samgov-import', samgovImportRoutes);
+app.use('/api/bid-decisions', bidDecisionsRoutes);
+app.use('/api/capability-gaps', capabilityGapsRoutes);
 
 // 404 handler
 app.use((req, res) => {

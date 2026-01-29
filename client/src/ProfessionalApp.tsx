@@ -11,6 +11,9 @@ import HelpPage from './pages/HelpPage'
 import ProfilePage from './pages/ProfilePage'
 import OpportunityDetailPage from './pages/OpportunityDetailPage'
 import ComingSoonPage from './pages/ComingSoonPage'
+import ProposalsPage from './pages/ProposalsPage'
+import ProposalImportPage from './pages/ProposalImportPage'
+import ProposalDetailPage from './pages/ProposalDetailPage'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -74,6 +77,11 @@ function ProfessionalApp() {
           <Route path="/coming-soon" element={<ProtectedRoute><ComingSoonPage /></ProtectedRoute>} />
           <Route path="/help" element={<ProtectedRoute><HelpPage /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+
+          {/* Proposal Maker Routes */}
+          <Route path="/proposals" element={<ProtectedRoute><ProposalsPage /></ProtectedRoute>} />
+          <Route path="/proposals/import" element={<ProtectedRoute><ProposalImportPage /></ProtectedRoute>} />
+          <Route path="/proposals/:id" element={<ProtectedRoute><ProposalDetailPage /></ProtectedRoute>} />
 
           {/* Catch all */}
           <Route path="*" element={<Navigate to="/" replace />} />
