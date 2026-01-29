@@ -195,8 +195,8 @@ function App() {
             {/* Public Search Route - for testing */}
             <Route path="/public-search" element={<SearchPage />} />
 
-            {/* Default route - redirect to dashboard */}
-            <Route path="/" element={<Navigate to="/public-search" replace />} />
+            {/* Default route - redirect to dashboard (which will redirect to login if not authenticated) */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
             {/* 404 - redirect to dashboard */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
