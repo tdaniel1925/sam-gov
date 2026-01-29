@@ -43,9 +43,9 @@ export default function Dashboard() {
           const hasNaicsCodes = profile?.naics_codes && profile.naics_codes.length > 0
           const filtered = hasNaicsCodes
             ? result.data.opportunitiesData.filter((opp: any) =>
-                profile.naics_codes.some(code =>
+                profile?.naics_codes?.some(code =>
                   opp.naicsCode === code || opp.naicsCodes?.includes(code)
-                )
+                ) || false
               )
             : result.data.opportunitiesData
           setOpportunities(filtered.slice(0, 20))
@@ -411,7 +411,7 @@ export default function Dashboard() {
                           
                           <div className="text-sm text-gray-600 space-y-1">
                             <div>
-                              <span className="font-medium">Industries:</span> {alert.naics_codes.join(', ')}
+                              <span className="font-medium">Industries:</span> {alert.naics_codes?.join(', ') || 'None'}
                             </div>
                             <div>
                               <span className="font-medium">Frequency:</span> {alert.frequency}
