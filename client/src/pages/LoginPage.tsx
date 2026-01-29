@@ -49,14 +49,14 @@ export default function LoginPage() {
     <div
       className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative"
       style={{
-        backgroundImage: 'url(https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?q=80&w=2940&auto=format&fit=crop)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1503149779833-1de50ebe5f8a?q=80&w=2835&auto=format&fit=crop)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
       }}
     >
       {/* Dark overlay for better text readability */}
-      <div className="absolute inset-0 bg-blue-900/40 backdrop-blur-[2px]"></div>
+      <div className="absolute inset-0 bg-blue-900/50 backdrop-blur-[1px]"></div>
 
       <div className="max-w-md w-full space-y-8 relative z-10">
         {/* White card container */}
