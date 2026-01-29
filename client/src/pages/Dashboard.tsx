@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { API_URL } from '../config/api'
 import { savedAPI, SavedOpportunity } from '../lib/api/saved'
 import { toast } from 'sonner'
 
 export default function Dashboard() {
+  const navigate = useNavigate()
   const { user, profile } = useAuth()
   const [opportunities, setOpportunities] = useState<any[]>([])
   const [savedOpportunities, setSavedOpportunities] = useState<SavedOpportunity[]>([])
@@ -119,6 +121,57 @@ export default function Dashboard() {
         <p className="text-gray-600 mt-2">
           Welcome to your SAM.gov Opportunities dashboard
         </p>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid md:grid-cols-3 gap-4 mb-8">
+        <button
+          onClick={() => navigate('/advanced-search')}
+          className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg p-6 text-left transition-all transform hover:scale-105 shadow-lg"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-bold mb-2">Advanced Search</h3>
+          <p className="text-blue-100 text-sm">15+ filters, AI-powered matching, save searches</p>
+        </button>
+
+        <button
+          onClick={() => navigate('/saved')}
+          className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg p-6 text-left transition-all transform hover:scale-105 shadow-lg"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+            </svg>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-bold mb-2">Saved Opportunities</h3>
+          <p className="text-purple-100 text-sm">{savedOpportunities.length} bookmarked contracts with notes</p>
+        </button>
+
+        <button
+          onClick={() => navigate('/notifications')}
+          className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg p-6 text-left transition-all transform hover:scale-105 shadow-lg"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-bold mb-2">Email Alerts</h3>
+          <p className="text-green-100 text-sm">Get notified of new opportunities</p>
+        </button>
       </div>
 
       {/* Introduction Section */}
@@ -370,17 +423,16 @@ export default function Dashboard() {
                       </svg>
                     </button>
 
-                    {/* View Details Button */}
-                    {opp.uiLink && (
-                      <a
-                        href={opp.uiLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
-                      >
-                        View Details
-                      </a>
-                    )}
+                    {/* View Details Button - Navigate to internal detail page */}
+                    <button
+                      onClick={() => navigate(`/opportunity/${opp.noticeId}`, { state: { opportunity: opp } })}
+                      className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors flex items-center gap-1"
+                    >
+                      View Details
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
                   </div>
                 </div>
               </div>

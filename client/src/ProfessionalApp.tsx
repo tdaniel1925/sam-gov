@@ -7,6 +7,7 @@ import AdvancedSearchPage from './pages/AdvancedSearchPage'
 import SavedPage from './pages/SavedPage'
 import NotificationsPage from './pages/NotificationsPage'
 import ProfilePage from './pages/ProfilePage'
+import OpportunityDetailPage from './pages/OpportunityDetailPage'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -37,6 +38,7 @@ function ProfessionalApp() {
           <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/advanced-search" element={<ProtectedRoute><AdvancedSearchPage /></ProtectedRoute>} />
+          <Route path="/opportunity/:id" element={<ProtectedRoute><OpportunityDetailPage /></ProtectedRoute>} />
           <Route path="/saved" element={<ProtectedRoute><SavedPage /></ProtectedRoute>} />
           <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
