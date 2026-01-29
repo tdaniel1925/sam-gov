@@ -23,6 +23,7 @@ import webhooksRoutes from './routes/webhooks';
 import alertsRoutes from './routes/alerts';
 import contentBlocksRoutes from './routes/content-blocks';
 import savedSearchesRoutes from './routes/saved-searches';
+import apiKeysRoutes from './routes/apiKeys';
 import { NotificationJob } from './services/notification-job';
 import { OpportunityMonitor } from './services/opportunity-monitor';
 
@@ -94,6 +95,7 @@ app.use('/api/opportunities', opportunitiesRoutes);
 app.use('/api/chat', chatbotRoutes);
 app.use('/api/documentation', documentationRoutes);
 app.use('/api/alerts', alertsRoutes);
+app.use('/api/api-keys', apiKeysRoutes);
 
 // 404 handler
 app.use((req, res) => {

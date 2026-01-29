@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 
 export default function Dashboard() {
   const navigate = useNavigate()
-  const { user, profile } = useAuth()
+  const { user, profile, tierStatus } = useAuth()
   const [opportunities, setOpportunities] = useState<any[]>([])
   const [savedOpportunities, setSavedOpportunities] = useState<SavedOpportunity[]>([])
   const [loading, setLoading] = useState(false)
@@ -122,6 +122,43 @@ export default function Dashboard() {
           Welcome to your SAM.gov Opportunities dashboard
         </p>
       </div>
+
+      {/* Tier Status Banner */}
+      {tierStatus && !tierStatus.isPaidTier && (
+        <div className="mb-6 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-lg p-6">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-2xl">🆓</span>
+                <h3 className="text-lg font-bold text-gray-900">Free Trial Mode</h3>
+              </div>
+              <p className="text-gray-700 mb-3">
+                You're using platform API keys with limited features.
+                <strong> {tierStatus.rateLimit.remaining} of {tierStatus.rateLimit.limit} daily searches remaining.</strong>
+              </p>
+              <ul className="text-sm text-gray-600 space-y-1 mb-4">
+                <li>• Add your SAM.gov API key for unlimited searches</li>
+                <li>• Add your OpenAI API key for AI features (summaries, scoring, proposals)</li>
+                <li>• No setup fees - just provide your own API keys</li>
+              </ul>
+              <button
+                onClick={() => navigate('/profile')}
+                className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-semibold transition-colors"
+              >
+                Add Your API Keys →
+              </button>
+            </div>
+            {tierStatus.rateLimit.remaining === 0 && (
+              <div className="ml-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-800 font-semibold text-sm">
+                  ⚠️ Daily limit reached!<br />
+                  Add your API keys to continue.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Quick Actions */}
       <div className="grid md:grid-cols-3 gap-4 mb-8">

@@ -1,16 +1,19 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { User, Session } from '@supabase/supabase-js'
 import { supabase, UserProfile } from '../lib/supabase'
+import { apiKeysAPI, TierStatus } from '../lib/apiKeys'
 
 interface AuthContextType {
   user: User | null
   profile: UserProfile | null
   session: Session | null
+  tierStatus: TierStatus | null
   loading: boolean
   signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<{ error: any }>
   signIn: (email: string, password: string) => Promise<{ error: any }>
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ error: any }>
+  refreshTierStatus: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -19,6 +22,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [session, setSession] = useState<Session | null>(null)
+  const [tierStatus, setTierStatus] = useState<TierStatus | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -86,9 +90,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setProfile(newProfile)
         }
       }
+
+      // Load tier status
+      await loadTierStatus()
     } catch (err) {
       console.error('Unexpected error loading profile:', err)
     }
+  }
+
+  const loadTierStatus = async () => {
+    try {
+      const status = await apiKeysAPI.getStatus()
+      setTierStatus(status)
+    } catch (err) {
+      console.error('Error loading tier status:', err)
+      // Set default free tier status on error
+      setTierStatus({
+        tier: 'free',
+        setupFeePaid: false,
+        isPaidTier: false,
+        rateLimit: {
+          used: 0,
+          limit: 1,
+          remaining: 1,
+          unlimited: false,
+          resetAt: null,
+        },
+      })
+    }
+  }
+
+  const refreshTierStatus = async () => {
+    await loadTierStatus()
   }
 
   const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
@@ -161,11 +194,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     profile,
     session,
+    tierStatus,
     loading,
     signUp,
     signIn,
     signOut,
     updateProfile,
+    refreshTierStatus,
   }
 
   return (

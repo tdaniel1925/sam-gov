@@ -24,6 +24,8 @@ export const notificationFrequencyEnum = pgEnum('notification_frequency', [
   'off',
 ]);
 
+export const userTierEnum = pgEnum('user_tier', ['free', 'paid']);
+
 export const subscriptionPlanEnum = pgEnum('subscription_plan', [
   'professional', // $499/month
   'business',     // $999/month
@@ -154,10 +156,20 @@ export const users = pgTable('users', {
   avatarUrl: text('avatar_url'),
   currentTeamId: uuid('current_team_id'), // Active team for multi-seat accounts
   onboardingCompleted: boolean('onboarding_completed').default(false).notNull(),
+
+  // Freemium tier system
+  tier: userTierEnum('tier').default('free').notNull(),
+  dailySearchesUsed: integer('daily_searches_used').default(0).notNull(),
+  lastSearchDate: timestamp('last_search_date', { mode: 'date' }),
+  setupFeePaid: boolean('setup_fee_paid').default(false).notNull(),
+  setupPaidAt: timestamp('setup_paid_at'),
+
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => ({
   emailIdx: index('users_email_idx').on(table.email),
+  tierIdx: index('users_tier_idx').on(table.tier),
+  lastSearchDateIdx: index('users_last_search_date_idx').on(table.lastSearchDate),
 }));
 
 // Subscriptions Table
@@ -497,9 +509,39 @@ export const savedSearches = pgTable('saved_searches', {
   alertEnabledIdx: index('saved_searches_alert_enabled_idx').on(table.alertEnabled),
 }));
 
+// User Payments Table (PayPal)
+export const userPayments = pgTable('user_payments', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull(), // References users.id
+
+  // Payment details
+  paymentType: text('payment_type').notNull(), // 'setup' or 'monthly'
+  amount: decimal('amount', { precision: 10, scale: 2 }).notNull(),
+  currency: text('currency').default('USD').notNull(),
+  status: text('status').notNull(), // 'pending', 'completed', 'failed'
+
+  // PayPal details
+  paypalOrderId: text('paypal_order_id'),
+  paypalPayerId: text('paypal_payer_id'),
+  paypalTransactionId: text('paypal_transaction_id'),
+
+  // Timestamps
+  paidAt: timestamp('paid_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: index('user_payments_user_id_idx').on(table.userId),
+  statusIdx: index('user_payments_status_idx').on(table.status),
+  paymentTypeIdx: index('user_payments_payment_type_idx').on(table.paymentType),
+  paidAtIdx: index('user_payments_paid_at_idx').on(table.paidAt),
+}));
+
 // Types - SaaS Tables
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+
+export type UserPayment = typeof userPayments.$inferSelect;
+export type NewUserPayment = typeof userPayments.$inferInsert;
 
 export type Subscription = typeof subscriptions.$inferSelect;
 export type NewSubscription = typeof subscriptions.$inferInsert;
