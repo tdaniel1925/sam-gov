@@ -1,8 +1,13 @@
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import ProfessionalAuth from './components/Auth/ProfessionalAuth'
 import Dashboard from './pages/Dashboard'
+import AdvancedSearchPage from './pages/AdvancedSearchPage'
+import SavedPage from './pages/SavedPage'
+import NotificationsPage from './pages/NotificationsPage'
+import ProfilePage from './pages/ProfilePage'
 
-function AppContent() {
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
 
   if (loading) {
@@ -16,13 +21,27 @@ function AppContent() {
     )
   }
 
-  return user ? <Dashboard /> : <ProfessionalAuth />
+  if (!user) {
+    return <ProfessionalAuth />
+  }
+
+  return <>{children}</>
 }
 
 function ProfessionalApp() {
   return (
     <AuthProvider>
-      <AppContent />
+      <Router>
+        <Routes>
+          <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/advanced-search" element={<ProtectedRoute><AdvancedSearchPage /></ProtectedRoute>} />
+          <Route path="/saved" element={<ProtectedRoute><SavedPage /></ProtectedRoute>} />
+          <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </Router>
     </AuthProvider>
   )
 }
