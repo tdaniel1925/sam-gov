@@ -75,8 +75,8 @@ function App() {
   const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
   const isBackendAvailable = import.meta.env.VITE_BACKEND_AVAILABLE !== 'false';
 
-  // Debug logging for deployment verification
-  console.log('🚀 SAM.gov App Loaded - Build 2026-01-29-07:00');
+  // Debug logging for deployment verification - Build 2026-01-29-07:35
+  console.log('🚀 SAM.gov App Loaded - Build 2026-01-29-07:35 - DEFENSIVE FIXES');
   console.log('📊 Environment Check:', {
     isDemoMode,
     isBackendAvailable,
@@ -90,7 +90,7 @@ function App() {
     return <SimpleApp />;
   }
 
-  console.log('✅ FULL APP MODE - showing authenticated app');
+  console.log('✅ FULL APP MODE - showing authenticated app with defensive null checks');
 
 
   return (
