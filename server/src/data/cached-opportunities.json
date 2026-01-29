@@ -1,0 +1,178 @@
+{
+  "lastUpdated": "2026-01-28",
+  "totalRecords": 19524,
+  "opportunities": [
+    {
+      "noticeId": "ffdd507bac974c589fa760120b0bbb9a",
+      "title": "TRANSMITTER TEMPERATURE",
+      "solicitationNumber": "70Z08026QAG036",
+      "fullParentPathName": "HOMELAND SECURITY, DEPARTMENT OF.US COAST GUARD.SFLC PROCUREMENT BRANCH 1(00080)",
+      "fullParentPathCode": "070.7008.70Z080",
+      "postedDate": "2026-01-28",
+      "type": "Combined Synopsis/Solicitation",
+      "baseType": "Combined Synopsis/Solicitation",
+      "archiveType": "auto15",
+      "archiveDate": "2026-02-14",
+      "typeOfSetAsideDescription": null,
+      "typeOfSetAside": null,
+      "responseDeadLine": "2026-01-30T14:00:00-05:00",
+      "naicsCode": "333914",
+      "naicsCodes": ["333914"],
+      "classificationCode": "6685",
+      "active": "Yes",
+      "award": null,
+      "pointOfContact": [
+        {
+          "fax": "",
+          "type": "primary",
+          "email": "NINA.M.CROSBY@USCG.MIL",
+          "phone": "4107626658",
+          "title": null,
+          "fullName": "NINA CROSBY"
+        }
+      ],
+      "description": "https://api.sam.gov/prod/opportunities/v1/noticedesc?noticeid=ffdd507bac974c589fa760120b0bbb9a",
+      "organizationType": "OFFICE",
+      "officeAddress": {
+        "zipcode": "23510",
+        "city": "NORFOLK",
+        "countryCode": "USA",
+        "state": "VA"
+      },
+      "placeOfPerformance": {
+        "country": {
+          "code": "USA",
+          "name": "UNITED STATES"
+        }
+      },
+      "additionalInfoLink": null,
+      "uiLink": "https://sam.gov/workspace/contract/opp/ffdd507bac974c589fa760120b0bbb9a/view",
+      "links": [
+        {
+          "rel": "self",
+          "href": "https://api.sam.gov/prod/opportunities/v2/search?noticeid=ffdd507bac974c589fa760120b0bbb9a&limit=1"
+        }
+      ],
+      "resourceLinks": []
+    },
+    {
+      "noticeId": "ffc1cd6100434f33b01361f78620dccb",
+      "title": "Clinical Dental Chairs",
+      "solicitationNumber": "36C25526Q0155",
+      "fullParentPathName": "VETERANS AFFAIRS, DEPARTMENT OF.VETERANS AFFAIRS, DEPARTMENT OF.255-NETWORK CONTRACT OFFICE 15 (36C255)",
+      "fullParentPathCode": "036.3600.36C255",
+      "postedDate": "2026-01-28",
+      "type": "Solicitation",
+      "baseType": "Solicitation",
+      "archiveType": "autocustom",
+      "archiveDate": "2026-02-03",
+      "typeOfSetAsideDescription": "Service-Disabled Veteran-Owned Small Business Set Aside",
+      "typeOfSetAside": "SDVOSBC",
+      "responseDeadLine": "2026-02-02T14:00:00-06:00",
+      "naicsCode": "339114",
+      "naicsCodes": ["339114"],
+      "classificationCode": "6520",
+      "active": "Yes",
+      "award": null,
+      "pointOfContact": [
+        {
+          "fax": "",
+          "type": "primary",
+          "email": "tonesha.king@va.gov",
+          "phone": "9139461971",
+          "title": null,
+          "fullName": "Tonesha King"
+        }
+      ],
+      "description": "https://api.sam.gov/prod/opportunities/v1/noticedesc?noticeid=ffc1cd6100434f33b01361f78620dccb",
+      "organizationType": "OFFICE",
+      "officeAddress": {
+        "zipcode": "66048",
+        "city": "LEAVENWORTH",
+        "countryCode": "USA",
+        "state": "KS"
+      },
+      "placeOfPerformance": {
+        "city": {
+          "code": "79000",
+          "name": "Wichita"
+        },
+        "state": {
+          "code": "KS",
+          "name": "Kansas"
+        },
+        "zip": "67218",
+        "country": {
+          "code": "USA",
+          "name": "UNITED STATES"
+        }
+      },
+      "additionalInfoLink": null,
+      "uiLink": "https://sam.gov/workspace/contract/opp/ffc1cd6100434f33b01361f78620dccb/view",
+      "links": [
+        {
+          "rel": "self",
+          "href": "https://api.sam.gov/prod/opportunities/v2/search?noticeid=ffc1cd6100434f33b01361f78620dccb&limit=1"
+        }
+      ],
+      "resourceLinks": []
+    },
+    {
+      "noticeId": "ffb1f53d2b634ac4adf105342bc56b4e",
+      "title": "PROCUREMENT OF ELECTRICAL ACCESSORIES AND SUPPLIES",
+      "solicitationNumber": "PR15776636",
+      "fullParentPathName": "STATE, DEPARTMENT OF.STATE, DEPARTMENT OF.US  EMBASSY BUJUMBURA",
+      "fullParentPathCode": "019.1900.19BY70",
+      "postedDate": "2026-01-28",
+      "type": "Solicitation",
+      "baseType": "Solicitation",
+      "archiveType": "auto15",
+      "archiveDate": "2026-02-26",
+      "typeOfSetAsideDescription": "No Set aside used",
+      "typeOfSetAside": "NONE",
+      "responseDeadLine": "2026-02-11T08:00:00+01:00",
+      "naicsCode": "444230",
+      "naicsCodes": ["444230"],
+      "classificationCode": "6210",
+      "active": "Yes",
+      "award": null,
+      "pointOfContact": [
+        {
+          "fax": "",
+          "type": "primary",
+          "email": "BujProcurement@state.gov",
+          "phone": "25722207006",
+          "title": null,
+          "fullName": "Bujumbura Procurement Section"
+        }
+      ],
+      "description": "https://api.sam.gov/prod/opportunities/v1/noticedesc?noticeid=ffb1f53d2b634ac4adf105342bc56b4e",
+      "organizationType": "OFFICE",
+      "officeAddress": {
+        "zipcode": "20520",
+        "city": "WASHINGTON",
+        "countryCode": "USA",
+        "state": "DC"
+      },
+      "placeOfPerformance": {
+        "city": {
+          "code": "BUJUMBURA",
+          "name": "BUJUMBURA"
+        },
+        "country": {
+          "code": "BDI",
+          "name": "BURUNDI"
+        }
+      },
+      "additionalInfoLink": null,
+      "uiLink": "https://sam.gov/workspace/contract/opp/ffb1f53d2b634ac4adf105342bc56b4e/view",
+      "links": [
+        {
+          "rel": "self",
+          "href": "https://api.sam.gov/prod/opportunities/v2/search?noticeid=ffb1f53d2b634ac4adf105342bc56b4e&limit=1"
+        }
+      ],
+      "resourceLinks": []
+    }
+  ]
+}

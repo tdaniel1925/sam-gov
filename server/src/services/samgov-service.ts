@@ -3,11 +3,12 @@
 // Following CodeBakers pattern 06f-api-patterns.md
 // =============================================================================
 
-import { samRequest } from '../lib/samgov-client';
+import { samRequest, SAMGovAPIError } from '../lib/samgov-client';
 import type {
   OpportunitySearchParams,
   OpportunitySearchResponse,
 } from '../types/samgov';
+import cachedData from '../data/cached-opportunities.json';
 
 export class SAMGovService {
   /**
@@ -94,9 +95,26 @@ export class SAMGovService {
       queryParams.q = params.keywords;
     }
 
-    return samRequest<OpportunitySearchResponse>('/search', {
-      params: queryParams,
-    });
+    try {
+      return await samRequest<OpportunitySearchResponse>('/search', {
+        params: queryParams,
+      });
+    } catch (error) {
+      // If SAM.gov blocks us (403), fall back to cached data
+      if (error instanceof SAMGovAPIError && error.statusCode === 403) {
+        console.log('⚠️  SAM.gov API blocked (403) - using cached data as fallback');
+        return {
+          totalRecords: cachedData.totalRecords,
+          limit: params.limit || 20,
+          offset: params.offset || 0,
+          opportunitiesData: cachedData.opportunities.slice(
+            params.offset || 0,
+            (params.offset || 0) + (params.limit || 20)
+          ),
+        };
+      }
+      throw error;
+    }
   }
 
   /**
