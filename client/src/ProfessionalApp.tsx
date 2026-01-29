@@ -14,6 +14,8 @@ import ComingSoonPage from './pages/ComingSoonPage'
 import ProposalsPage from './pages/ProposalsPage'
 import ProposalImportPage from './pages/ProposalImportPage'
 import ProposalDetailPage from './pages/ProposalDetailPage'
+import SavedSearchesPage from './pages/SavedSearchesPage'
+import WinRateDashboardPage from './pages/WinRateDashboardPage'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -82,6 +84,12 @@ function ProfessionalApp() {
           <Route path="/proposals" element={<ProtectedRoute><ProposalsPage /></ProtectedRoute>} />
           <Route path="/proposals/import" element={<ProtectedRoute><ProposalImportPage /></ProtectedRoute>} />
           <Route path="/proposals/:id" element={<ProtectedRoute><ProposalDetailPage /></ProtectedRoute>} />
+
+          {/* Saved Search Templates */}
+          <Route path="/saved-searches" element={<ProtectedRoute><SavedSearchesPage /></ProtectedRoute>} />
+
+          {/* Win Rate Dashboard */}
+          <Route path="/win-rate" element={<ProtectedRoute><WinRateDashboardPage /></ProtectedRoute>} />
 
           {/* Catch all */}
           <Route path="*" element={<Navigate to="/" replace />} />

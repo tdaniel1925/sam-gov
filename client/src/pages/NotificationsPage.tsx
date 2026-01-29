@@ -8,8 +8,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { Bell, Plus, Trash2, Loader2 } from 'lucide-react';
+import { Bell, Plus, Trash2, Loader2, Mail, Send } from 'lucide-react';
 import { notificationsAPI, type NotificationSubscription } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 
 const subscribeSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -20,11 +21,19 @@ const subscribeSchema = z.object({
 type SubscribeFormData = z.infer<typeof subscribeSchema>;
 
 export default function NotificationsPage() {
+  const { session } = useAuth();
   const [subscriptions, setSubscriptions] = useState<NotificationSubscription[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState('');
+
+  // General notification preferences
+  const [prefsLoading, setPrefsLoading] = useState(true);
+  const [emailEnabled, setEmailEnabled] = useState(true);
+  const [emailFrequency, setEmailFrequency] = useState<'daily' | 'weekly' | 'realtime' | 'off'>('daily');
+  const [prefsSaving, setPrefsSaving] = useState(false);
+  const [testEmailSending, setTestEmailSending] = useState(false);
 
   const {
     register,
@@ -39,6 +48,77 @@ export default function NotificationsPage() {
       frequency: 'daily',
     },
   });
+
+  // Load general preferences on mount
+  useEffect(() => {
+    if (session?.access_token) {
+      loadPreferences();
+    }
+  }, [session]);
+
+  const loadPreferences = async () => {
+    try {
+      setPrefsLoading(true);
+      const response = await fetch('http://localhost:3001/api/notification-preferences', {
+        headers: { 'Authorization': `Bearer ${session?.access_token}` },
+      });
+
+      if (!response.ok) throw new Error('Failed to load preferences');
+
+      const data = await response.json();
+      setEmailEnabled(data.data.emailEnabled);
+      setEmailFrequency(data.data.emailFrequency);
+    } catch (error) {
+      console.error('Load preferences error:', error);
+      toast.error('Failed to load notification preferences');
+    } finally {
+      setPrefsLoading(false);
+    }
+  };
+
+  const savePreferences = async () => {
+    try {
+      setPrefsSaving(true);
+      const response = await fetch('http://localhost:3001/api/notification-preferences', {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${session?.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ emailEnabled, emailFrequency }),
+      });
+
+      if (!response.ok) throw new Error('Failed to save preferences');
+
+      const data = await response.json();
+      toast.success(data.message || 'Preferences saved successfully');
+    } catch (error) {
+      console.error('Save preferences error:', error);
+      toast.error('Failed to save preferences');
+    } finally {
+      setPrefsSaving(false);
+    }
+  };
+
+  const sendTestEmail = async () => {
+    try {
+      setTestEmailSending(true);
+      const response = await fetch('http://localhost:3001/api/notification-preferences/test', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${session?.access_token}` },
+      });
+
+      if (!response.ok) throw new Error('Failed to send test email');
+
+      const data = await response.json();
+      toast.success(data.message);
+    } catch (error) {
+      console.error('Test email error:', error);
+      toast.error('Failed to send test email');
+    } finally {
+      setTestEmailSending(false);
+    }
+  };
 
   const loadSubscriptions = async (email: string) => {
     if (!email) return;
@@ -89,15 +169,108 @@ export default function NotificationsPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Subscribe Form */}
+      {/* General Notification Preferences */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+          <Mail className="text-blue-600" size={28} />
+          Notification Preferences
+        </h2>
+
+        {prefsLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="animate-spin text-blue-600" size={32} />
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {/* Email Enabled Toggle */}
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div>
+                <h3 className="font-semibold text-gray-900">Email Notifications</h3>
+                <p className="text-sm text-gray-600">Receive email digests and alerts</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={emailEnabled}
+                  onChange={(e) => setEmailEnabled(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+
+            {/* Email Frequency */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email Digest Frequency
+              </label>
+              <select
+                value={emailFrequency}
+                onChange={(e) => setEmailFrequency(e.target.value as any)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={!emailEnabled}
+              >
+                <option value="daily">Daily Digest</option>
+                <option value="weekly">Weekly Summary</option>
+                <option value="realtime">Real-time Alerts</option>
+                <option value="off">Off</option>
+              </select>
+              <p className="mt-2 text-sm text-gray-500">
+                {emailFrequency === 'daily' && 'Receive one email per day with all new opportunities'}
+                {emailFrequency === 'weekly' && 'Receive one email per week with a summary'}
+                {emailFrequency === 'realtime' && 'Receive emails immediately when opportunities are found'}
+                {emailFrequency === 'off' && 'No automated emails (manual alerts only)'}
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={savePreferences}
+                disabled={prefsSaving}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:bg-gray-400"
+              >
+                {prefsSaving ? (
+                  <>
+                    <Loader2 className="animate-spin" size={16} />
+                    Saving...
+                  </>
+                ) : (
+                  'Save Preferences'
+                )}
+              </button>
+
+              <button
+                onClick={sendTestEmail}
+                disabled={testEmailSending}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2 disabled:bg-gray-400 disabled:text-white"
+              >
+                {testEmailSending ? (
+                  <>
+                    <Loader2 className="animate-spin" size={16} />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send size={16} />
+                    Send Test Email
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* NAICS Subscriptions Form */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
         <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
           <Bell className="text-blue-600" size={28} />
-          Email Notifications
+          NAICS Code Subscriptions
         </h2>
 
         <p className="text-gray-600 mb-6">
-          Get notified when new contracting opportunities are posted for your NAICS codes.
+          Get notified when new contracting opportunities are posted for specific NAICS codes.
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

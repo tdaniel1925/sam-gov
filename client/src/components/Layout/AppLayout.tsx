@@ -14,6 +14,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
     { path: '/dashboard', label: 'Dashboard' },
     { path: '/advanced-search', label: 'Advanced Search' },
     { path: '/proposals', label: 'Proposals' },
+    { path: '/saved-searches', label: 'Saved Searches' },
+    { path: '/win-rate', label: 'Win Rate' },
     { path: '/saved', label: 'Saved' },
     { path: '/notifications', label: 'Notifications' },
     { path: '/coming-soon', label: 'Coming Soon' },
