@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import ProfessionalAuth from './components/Auth/ProfessionalAuth'
+import AppLayout from './components/Layout/AppLayout'
 import Dashboard from './pages/Dashboard'
 import AdvancedSearchPage from './pages/AdvancedSearchPage'
 import SavedPage from './pages/SavedPage'
@@ -25,7 +26,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <ProfessionalAuth />
   }
 
-  return <>{children}</>
+  return <AppLayout>{children}</AppLayout>
 }
 
 function ProfessionalApp() {
