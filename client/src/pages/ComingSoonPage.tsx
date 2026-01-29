@@ -216,9 +216,28 @@ export default function ComingSoonPage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Coming Soon
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-6">
             We're constantly innovating to bring you powerful new features that make finding and winning government contracts easier than ever.
           </p>
+
+          {/* MVP Notice */}
+          <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg border-2 border-indigo-200 p-6">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <h3 className="font-bold text-gray-900 mb-2">📋 MVP Version Notice</h3>
+                <p className="text-sm text-gray-700">
+                  This platform is currently in <strong>MVP (Minimum Viable Product)</strong> stage.
+                  Core search and discovery features are fully functional, but some features like email notifications,
+                  proposal generation, and team collaboration are not yet operational. The roadmap below shows our planned enhancements.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Timeline Overview */}

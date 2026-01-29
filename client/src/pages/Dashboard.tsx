@@ -123,6 +123,38 @@ export default function Dashboard() {
         </p>
       </div>
 
+      {/* MVP Disclaimer Banner */}
+      <div className="mb-6 bg-gradient-to-r from-indigo-50 to-blue-50 border-2 border-indigo-200 rounded-lg p-6">
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0 mt-1">
+            <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div className="flex-1">
+            <h3 className="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
+              <span>🚀</span>
+              <span>MVP Version - Demo Mode</span>
+            </h3>
+            <p className="text-gray-700 mb-3">
+              This is a <strong>Minimum Viable Product (MVP)</strong> demonstration. Some features are not yet functional while we continue development.
+            </p>
+            <div className="bg-white/60 rounded-lg p-4 mb-3">
+              <p className="text-sm font-semibold text-gray-800 mb-2">Currently Non-Functional Features:</p>
+              <ul className="text-sm text-gray-700 space-y-1">
+                <li>• <strong>Email Notifications</strong> - Saved search alerts and opportunity updates are not being sent</li>
+                <li>• <strong>Proposal Generator</strong> - AI proposal generation is in development</li>
+                <li>• <strong>Team Collaboration</strong> - Multi-user features coming soon</li>
+                <li>• <strong>Advanced Analytics</strong> - Win rate tracking and reporting not yet available</li>
+              </ul>
+            </div>
+            <p className="text-sm text-indigo-700 font-medium">
+              ✨ Core features are fully functional: Search, Advanced Filters, AI Summaries, Opportunity Details, and Bookmarking
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Tier Status Banner */}
       {tierStatus && !tierStatus.isPaidTier && (
         <div className="mb-6 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-lg p-6">

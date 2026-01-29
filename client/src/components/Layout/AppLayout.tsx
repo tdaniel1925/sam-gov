@@ -72,6 +72,26 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
       {/* Main Content */}
       <main>{children}</main>
+
+      {/* MVP Footer Notice */}
+      <footer className="bg-gray-50 border-t border-gray-200 mt-12">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+            <svg className="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p>
+              <strong>MVP Demo:</strong> Some features (email notifications, proposals) not yet functional.
+              <button
+                onClick={() => navigate('/coming-soon')}
+                className="text-indigo-600 hover:text-indigo-700 font-medium ml-1 underline"
+              >
+                View roadmap →
+              </button>
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
