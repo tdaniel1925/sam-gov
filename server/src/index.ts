@@ -29,7 +29,7 @@ import { OpportunityMonitor } from './services/opportunity-monitor';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// CORS Configuration - Support multiple origins
+// CORS Configuration - Support multiple origins including all Vercel deployments
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3002',
@@ -43,6 +43,12 @@ app.use(cors({
     // Allow requests with no origin (like mobile apps or curl)
     if (!origin) return callback(null, true);
 
+    // Allow all Vercel deployment URLs (*.vercel.app)
+    if (origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+
+    // Allow explicitly listed origins
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
