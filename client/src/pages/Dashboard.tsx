@@ -39,14 +39,20 @@ export default function Dashboard() {
       if (response.ok) {
         const result = await response.json()
         if (result.data?.opportunitiesData) {
-          // Filter by user's NAICS codes
-          const filtered = result.data.opportunitiesData.filter((opp: any) =>
-            profile?.naics_codes?.some(code => 
-              opp.naicsCode === code || opp.naicsCodes?.includes(code)
-            )
-          )
+          // Filter by user's NAICS codes, or show all if no codes set
+          const hasNaicsCodes = profile?.naics_codes && profile.naics_codes.length > 0
+          const filtered = hasNaicsCodes
+            ? result.data.opportunitiesData.filter((opp: any) =>
+                profile.naics_codes.some(code =>
+                  opp.naicsCode === code || opp.naicsCodes?.includes(code)
+                )
+              )
+            : result.data.opportunitiesData
           setOpportunities(filtered.slice(0, 20))
         }
+      } else {
+        // Show error message to user
+        console.error('API Error:', response.status, await response.text())
       }
     } catch (error) {
       console.error('Error loading opportunities:', error)
