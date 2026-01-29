@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import Button from '../UI/Button'
 
@@ -43,6 +44,7 @@ const NAICS_CATEGORIES = [
 ]
 
 export default function ProfessionalAuth() {
+  const navigate = useNavigate()
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -71,6 +73,8 @@ export default function ProfessionalAuth() {
           showMessage(`Login failed: ${error.message}`, 'error')
         } else {
           showMessage('Welcome back!', 'success')
+          // Navigate to dashboard after successful login
+          setTimeout(() => navigate('/dashboard'), 500)
         }
       } else {
         if (selectedNaics.length === 0) {
@@ -84,6 +88,8 @@ export default function ProfessionalAuth() {
           showMessage(`Account creation failed: ${error.message}`, 'error')
         } else {
           showMessage('Account created successfully! Please check your email to confirm your account.', 'success')
+          // Navigate to dashboard after successful signup
+          setTimeout(() => navigate('/dashboard'), 500)
         }
       }
     } catch (error: any) {
@@ -155,6 +161,7 @@ export default function ProfessionalAuth() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Enter your email"
@@ -171,6 +178,7 @@ export default function ProfessionalAuth() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  autoComplete={isLogin ? "current-password" : "new-password"}
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Enter your password"
