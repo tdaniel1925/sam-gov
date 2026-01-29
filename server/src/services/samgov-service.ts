@@ -100,9 +100,10 @@ export class SAMGovService {
         params: queryParams,
       });
     } catch (error) {
-      // If SAM.gov blocks us (403), fall back to cached data
-      if (error instanceof SAMGovAPIError && error.statusCode === 403) {
-        console.log('⚠️  SAM.gov API blocked (403) - using cached data as fallback');
+      // If SAM.gov blocks us (403 or 429), fall back to cached data
+      if (error instanceof SAMGovAPIError && (error.statusCode === 403 || error.statusCode === 429)) {
+        const reason = error.statusCode === 403 ? 'Forbidden (IP blocked)' : 'Rate limit exceeded';
+        console.log(`⚠️  SAM.gov API error (${error.statusCode} ${reason}) - using cached data as fallback`);
         return {
           totalRecords: cachedData.totalRecords,
           limit: params.limit || 20,
