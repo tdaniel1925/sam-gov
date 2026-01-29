@@ -181,6 +181,126 @@ export default function NotificationsPage() {
         </form>
       </div>
 
+      {/* Sample Email Preview */}
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-md p-6 mb-8 border border-blue-200">
+        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          Sample Email Preview
+        </h3>
+
+        <p className="text-gray-600 mb-4 text-sm">
+          Here's what you'll receive when new opportunities match your NAICS codes:
+        </p>
+
+        {/* Email Mockup */}
+        <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+          {/* Email Header */}
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white">
+            <h4 className="text-2xl font-bold mb-2">New SAM.gov Opportunities</h4>
+            <p className="text-blue-100 text-sm">5 new contracts matching NAICS 541512</p>
+          </div>
+
+          {/* Email Body */}
+          <div className="p-6">
+            <p className="text-gray-700 mb-4">Hello,</p>
+            <p className="text-gray-700 mb-6">
+              We found <strong>5 new opportunities</strong> that match your saved search criteria:
+            </p>
+
+            {/* Sample Opportunity 1 */}
+            <div className="mb-6 pb-6 border-b border-gray-200">
+              <h5 className="text-lg font-semibold text-blue-600 mb-2">
+                IT Infrastructure Support Services - Cloud Migration
+              </h5>
+              <div className="grid grid-cols-2 gap-3 text-sm text-gray-600 mb-3">
+                <div>
+                  <span className="font-medium">Department:</span> Department of Defense
+                </div>
+                <div>
+                  <span className="font-medium">NAICS:</span> 541512
+                </div>
+                <div>
+                  <span className="font-medium">Posted:</span> Jan 28, 2026
+                </div>
+                <div className="text-orange-600 font-medium">
+                  <span className="font-medium">Deadline:</span> Feb 15, 2026
+                </div>
+              </div>
+              <p className="text-gray-600 text-sm mb-3">
+                Seeking qualified contractors to provide comprehensive IT infrastructure support including network management, cybersecurity, and cloud migration services...
+              </p>
+              <a href="#" className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium text-sm">
+                View Full Details →
+              </a>
+            </div>
+
+            {/* Sample Opportunity 2 */}
+            <div className="mb-6 pb-6 border-b border-gray-200">
+              <h5 className="text-lg font-semibold text-blue-600 mb-2">
+                Cybersecurity Assessment and Remediation
+              </h5>
+              <div className="grid grid-cols-2 gap-3 text-sm text-gray-600 mb-3">
+                <div>
+                  <span className="font-medium">Department:</span> DHS/CISA
+                </div>
+                <div>
+                  <span className="font-medium">NAICS:</span> 541512
+                </div>
+                <div>
+                  <span className="font-medium">Posted:</span> Jan 28, 2026
+                </div>
+                <div className="text-orange-600 font-medium">
+                  <span className="font-medium">Deadline:</span> Feb 20, 2026
+                </div>
+              </div>
+              <p className="text-gray-600 text-sm mb-3">
+                Federal cybersecurity assessment project requiring comprehensive vulnerability testing and remediation planning...
+              </p>
+              <a href="#" className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium text-sm">
+                View Full Details →
+              </a>
+            </div>
+
+            {/* More Opportunities Link */}
+            <div className="text-center py-4 bg-gray-50 rounded-lg">
+              <p className="text-gray-600 mb-3">+ 3 more opportunities</p>
+              <a href="#" className="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                View All 5 Opportunities
+              </a>
+            </div>
+
+            {/* Email Footer */}
+            <div className="mt-6 pt-6 border-t border-gray-200 text-center">
+              <p className="text-xs text-gray-500 mb-2">
+                You're receiving this because you subscribed to alerts for NAICS 541512
+              </p>
+              <p className="text-xs text-gray-400">
+                SAM.gov Opportunities Platform |
+                <a href="#" className="text-blue-600 hover:underline ml-1">Manage Subscriptions</a> |
+                <a href="#" className="text-blue-600 hover:underline ml-1">Unsubscribe</a>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Frequency Note */}
+        <div className="mt-4 p-4 bg-white rounded-lg border border-blue-200">
+          <h5 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Frequency Options
+          </h5>
+          <ul className="text-sm text-gray-600 space-y-1">
+            <li><strong>Daily:</strong> Receive one email per day at 8 AM with all new opportunities</li>
+            <li><strong>Weekly:</strong> Receive one email every Monday with the week's opportunities</li>
+            <li><strong>Real-time:</strong> Receive an email immediately when a new opportunity is posted</li>
+          </ul>
+        </div>
+      </div>
+
       {/* Current Subscriptions */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h3 className="text-xl font-bold mb-4">Your Subscriptions</h3>
