@@ -109,13 +109,13 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`
 ╔═══════════════════════════════════════════════════════════╗
 ║                                                           ║
 ║   SAM.gov Contracting Opportunities API                  ║
 ║                                                           ║
-║   Server running on: http://localhost:${PORT}              ║
+║   Server running on port: ${PORT}                          ║
 ║   Environment: ${process.env.NODE_ENV || 'development'}                               ║
 ║                                                           ║
 ╚═══════════════════════════════════════════════════════════╝
