@@ -53,7 +53,7 @@ interface CapabilityAnalysis {
 export default function ProposalDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { session } = useAuth();
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const [bidAnalysis, setBidAnalysis] = useState<BidAnalysis | null>(null);
   const [capabilityAnalysis, setCapabilityAnalysis] = useState<CapabilityAnalysis | null>(null);
@@ -63,17 +63,19 @@ export default function ProposalDetailPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (id) {
+    if (id && session?.access_token) {
       fetchProposal();
     }
-  }, [id]);
+  }, [id, session]);
 
   const fetchProposal = async () => {
+    if (!session?.access_token) return;
+
     try {
       setLoading(true);
       const response = await fetch(`http://localhost:3001/api/proposals/${id}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${session.access_token}`,
         },
       });
 
@@ -85,7 +87,7 @@ export default function ProposalDetailPage() {
       // Try to fetch existing bid decision
       try {
         const bidResponse = await fetch(`http://localhost:3001/api/bid-decisions/${id}`, {
-          headers: { 'Authorization': `Bearer ${token}` },
+          headers: { 'Authorization': `Bearer ${session.access_token}` },
         });
         if (bidResponse.ok) {
           const bidData = await bidResponse.json();
@@ -98,7 +100,7 @@ export default function ProposalDetailPage() {
       // Try to fetch existing capability gaps
       try {
         const gapResponse = await fetch(`http://localhost:3001/api/capability-gaps/${id}`, {
-          headers: { 'Authorization': `Bearer ${token}` },
+          headers: { 'Authorization': `Bearer ${session.access_token}` },
         });
         if (gapResponse.ok) {
           const gapData = await gapResponse.json();
@@ -128,6 +130,8 @@ export default function ProposalDetailPage() {
   };
 
   const handleBidAnalysis = async () => {
+    if (!session?.access_token) return;
+
     try {
       setAnalyzing(true);
       setError(null);
@@ -135,7 +139,7 @@ export default function ProposalDetailPage() {
       const response = await fetch('http://localhost:3001/api/bid-decisions/analyze', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ proposalId: id }),
@@ -158,6 +162,8 @@ export default function ProposalDetailPage() {
   };
 
   const handleCapabilityAnalysis = async () => {
+    if (!session?.access_token) return;
+
     try {
       setAnalyzing(true);
       setError(null);
@@ -165,7 +171,7 @@ export default function ProposalDetailPage() {
       const response = await fetch('http://localhost:3001/api/capability-gaps/analyze', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ proposalId: id }),

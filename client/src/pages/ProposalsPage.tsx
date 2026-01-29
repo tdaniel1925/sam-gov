@@ -23,22 +23,26 @@ interface Proposal {
 
 export default function ProposalsPage() {
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { session } = useAuth();
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
 
   useEffect(() => {
-    fetchProposals();
-  }, []);
+    if (session?.access_token) {
+      fetchProposals();
+    }
+  }, [session]);
 
   const fetchProposals = async () => {
+    if (!session?.access_token) return;
+
     try {
       setLoading(true);
       const response = await fetch('http://localhost:3001/api/proposals', {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${session.access_token}`,
         },
       });
 

@@ -23,7 +23,7 @@ interface PreviewData {
 
 export default function ProposalImportPage() {
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { session } = useAuth();
   const [noticeId, setNoticeId] = useState('');
   const [loading, setLoading] = useState(false);
   const [previewing, setPreviewing] = useState(false);
@@ -43,7 +43,7 @@ export default function ProposalImportPage() {
 
       const response = await fetch(`http://localhost:3001/api/samgov-import/preview/${noticeId}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${session?.access_token}`,
         },
       });
 
@@ -75,7 +75,7 @@ export default function ProposalImportPage() {
       const response = await fetch('http://localhost:3001/api/samgov-import/opportunity', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${session?.access_token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
