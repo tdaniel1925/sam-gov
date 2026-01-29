@@ -16,9 +16,10 @@ interface SearchAlert {
 export default function Dashboard() {
   const { user, profile, signOut } = useAuth()
   const [activeTab, setActiveTab] = useState<'opportunities' | 'alerts' | 'profile'>('opportunities')
-  const [opportunities, setOpportunities] = useState([])
+  const [opportunities, setOpportunities] = useState<any[]>([])
   const [alerts, setAlerts] = useState<SearchAlert[]>([])
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [newAlertForm, setNewAlertForm] = useState({
     name: '',
     naics_codes: [] as string[],
@@ -33,14 +34,15 @@ export default function Dashboard() {
 
   const loadOpportunities = async () => {
     setLoading(true)
+    setError(null)
     try {
       // This would call your real API
       const response = await fetch(API_URL + '/search/recent')
       if (response.ok) {
         const result = await response.json()
-        if (result.data?.opportunitiesData) {
+        if (result.data?.opportunitiesData && Array.isArray(result.data.opportunitiesData)) {
           // Filter by user's NAICS codes, or show all if no codes set
-          const hasNaicsCodes = profile?.naics_codes && profile.naics_codes.length > 0
+          const hasNaicsCodes = profile?.naics_codes && Array.isArray(profile.naics_codes) && profile.naics_codes.length > 0
           const filtered = hasNaicsCodes
             ? result.data.opportunitiesData.filter((opp: any) =>
                 profile?.naics_codes?.some(code =>
@@ -48,14 +50,19 @@ export default function Dashboard() {
                 ) || false
               )
             : result.data.opportunitiesData
-          setOpportunities(filtered.slice(0, 20))
+          setOpportunities(Array.isArray(filtered) ? filtered.slice(0, 20) : [])
+        } else {
+          setOpportunities([])
         }
       } else {
         // Show error message to user
+        setError(`API Error: ${response.status}`)
         console.error('API Error:', response.status, await response.text())
       }
     } catch (error) {
+      setError('Failed to load opportunities')
       console.error('Error loading opportunities:', error)
+      setOpportunities([])
     } finally {
       setLoading(false)
     }
@@ -66,12 +73,15 @@ export default function Dashboard() {
       const response = await fetch(API_URL + '/alerts')
       if (response.ok) {
         const result = await response.json()
-        if (result.data) {
+        if (result.data && Array.isArray(result.data)) {
           setAlerts(result.data)
+        } else {
+          setAlerts([])
         }
       }
     } catch (error) {
       console.error('Error loading alerts:', error)
+      setAlerts([])
     }
   }
 
