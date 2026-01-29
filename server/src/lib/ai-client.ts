@@ -9,12 +9,24 @@ import OpenAI from 'openai';
 // Lazy initialization to avoid errors in tests
 let openaiClient: OpenAI | null = null;
 
-export function getOpenAIClient(): OpenAI {
+/**
+ * Get OpenAI client with optional user API key
+ * @param userApiKey - Optional user's OpenAI API key (falls back to platform key)
+ */
+export function getOpenAIClient(userApiKey?: string): OpenAI {
+  // If user provides their own key, create a new client for them
+  if (userApiKey) {
+    console.log('🔑 Using user-provided OpenAI API key');
+    return new OpenAI({ apiKey: userApiKey });
+  }
+
+  // Otherwise use cached platform client
   if (!openaiClient) {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
       throw new Error('OPENAI_API_KEY environment variable is required');
     }
+    console.log('🔑 Using platform OpenAI API key');
     openaiClient = new OpenAI({ apiKey });
   }
   return openaiClient;

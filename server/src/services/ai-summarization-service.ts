@@ -68,9 +68,12 @@ export interface OpportunitySummary {
 export class AISummarizationService {
   /**
    * Generate comprehensive summary of an opportunity
+   * @param opportunity - Opportunity to summarize
+   * @param openaiApiKey - Optional user's OpenAI API key (falls back to platform key)
    */
   static async summarizeOpportunity(
-    opportunity: Opportunity
+    opportunity: Opportunity,
+    openaiApiKey?: string
   ): Promise<OpportunitySummary> {
     // If no AI available, return rule-based summary
     if (!isAIAvailable()) {
@@ -78,7 +81,7 @@ export class AISummarizationService {
     }
 
     try {
-      const client = getOpenAIClient();
+      const client = getOpenAIClient(openaiApiKey);
 
       const prompt = this.buildSummarizationPrompt(opportunity);
 
@@ -370,15 +373,18 @@ INSTRUCTIONS:
 
   /**
    * Batch summarize multiple opportunities
+   * @param opportunities - Opportunities to summarize
+   * @param openaiApiKey - Optional user's OpenAI API key (falls back to platform key)
    */
   static async summarizeOpportunities(
-    opportunities: Opportunity[]
+    opportunities: Opportunity[],
+    openaiApiKey?: string
   ): Promise<Map<string, OpportunitySummary>> {
     const summaries = new Map<string, OpportunitySummary>();
 
     for (const opportunity of opportunities) {
       try {
-        const summary = await this.summarizeOpportunity(opportunity);
+        const summary = await this.summarizeOpportunity(opportunity, openaiApiKey);
         summaries.set(opportunity.noticeId, summary);
       } catch (error) {
         console.error(`Error summarizing opportunity ${opportunity.noticeId}:`, error);

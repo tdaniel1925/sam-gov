@@ -13,9 +13,12 @@ import cachedData from '../data/cached-opportunities.json';
 export class SAMGovService {
   /**
    * Search for contracting opportunities
+   * @param params - Search parameters
+   * @param apiKey - Optional user's SAM.gov API key (falls back to platform key)
    */
   static async searchOpportunities(
-    params: OpportunitySearchParams
+    params: OpportunitySearchParams,
+    apiKey?: string
   ): Promise<OpportunitySearchResponse> {
     // Validate date range (max 1 year per API requirements)
     const fromDate = new Date(params.postedFrom);
@@ -98,6 +101,7 @@ export class SAMGovService {
     try {
       return await samRequest<OpportunitySearchResponse>('/search', {
         params: queryParams,
+        apiKey, // Pass user's API key if provided
       });
     } catch (error) {
       // Log error details for debugging
@@ -118,6 +122,7 @@ export class SAMGovService {
             params.offset || 0,
             (params.offset || 0) + (params.limit || 20)
           ),
+          links: [],
         };
       }
 
@@ -132,6 +137,7 @@ export class SAMGovService {
             params.offset || 0,
             (params.offset || 0) + (params.limit || 20)
           ),
+          links: [],
         };
       }
 
@@ -160,10 +166,14 @@ export class SAMGovService {
 
   /**
    * Get recent opportunities (last 30 days)
+   * @param naicsCode - Optional NAICS code filter
+   * @param limit - Number of results to return
+   * @param apiKey - Optional user's SAM.gov API key (falls back to platform key)
    */
   static async getRecentOpportunities(
     naicsCode?: string,
-    limit: number = 20
+    limit: number = 20,
+    apiKey?: string
   ): Promise<OpportunitySearchResponse> {
     const today = new Date();
     const thirtyDaysAgo = new Date(today);
@@ -182,6 +192,6 @@ export class SAMGovService {
       postedTo: formatDate(today),
       limit,
       offset: 0,
-    });
+    }, apiKey);
   }
 }

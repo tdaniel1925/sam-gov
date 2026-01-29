@@ -71,14 +71,15 @@ export class ProposalGenerationService {
   static async generateProposalOutline(
     opportunity: Opportunity,
     summary: OpportunitySummary,
-    companyProfile: CompanyProfile
+    companyProfile: CompanyProfile,
+    openaiApiKey?: string
   ): Promise<ProposalOutline> {
     if (!isAIAvailable()) {
       return this.generateBasicOutline(opportunity, summary, companyProfile);
     }
 
     try {
-      const client = getOpenAIClient();
+      const client = getOpenAIClient(openaiApiKey);
 
       const prompt = this.buildProposalPrompt(opportunity, summary, companyProfile);
 
@@ -398,14 +399,15 @@ INSTRUCTIONS:
    * This would parse actual RFP documents if available
    */
   static async generateDetailedComplianceMatrix(
-    opportunityDescription: string
+    opportunityDescription: string,
+    openaiApiKey?: string
   ): Promise<ComplianceMatrixItem[]> {
     if (!isAIAvailable()) {
       return [];
     }
 
     try {
-      const client = getOpenAIClient();
+      const client = getOpenAIClient(openaiApiKey);
 
       const prompt = `
 Extract ALL requirements from this RFP excerpt and create a compliance matrix:

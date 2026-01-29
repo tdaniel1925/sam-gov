@@ -28,10 +28,14 @@ export interface OpportunityScore {
 export class AIScoringService {
   /**
    * Score an opportunity based on company profile
+   * @param opportunity - Opportunity to score
+   * @param companyProfile - User's company profile
+   * @param openaiApiKey - Optional user's OpenAI API key (falls back to platform key)
    */
   static async scoreOpportunity(
     opportunity: Opportunity,
-    companyProfile: CompanyProfile | null
+    companyProfile: CompanyProfile | null,
+    openaiApiKey?: string
   ): Promise<OpportunityScore> {
     // If no AI available, return basic rule-based scoring
     if (!isAIAvailable() || !companyProfile) {
@@ -39,7 +43,7 @@ export class AIScoringService {
     }
 
     try {
-      const client = getOpenAIClient();
+      const client = getOpenAIClient(openaiApiKey);
 
       const prompt = this.buildScoringPrompt(opportunity, companyProfile);
 
@@ -203,16 +207,20 @@ Score based on:
 
   /**
    * Batch score multiple opportunities
+   * @param opportunities - Opportunities to score
+   * @param companyProfile - User's company profile
+   * @param openaiApiKey - Optional user's OpenAI API key (falls back to platform key)
    */
   static async scoreOpportunities(
     opportunities: Opportunity[],
-    companyProfile: CompanyProfile | null
+    companyProfile: CompanyProfile | null,
+    openaiApiKey?: string
   ): Promise<Map<string, OpportunityScore>> {
     const scores = new Map<string, OpportunityScore>();
 
     for (const opportunity of opportunities) {
       try {
-        const score = await this.scoreOpportunity(opportunity, companyProfile);
+        const score = await this.scoreOpportunity(opportunity, companyProfile, openaiApiKey);
         scores.set(opportunity.noticeId, score);
       } catch (error) {
         console.error(`Error scoring opportunity ${opportunity.noticeId}:`, error);
@@ -225,8 +233,13 @@ Score based on:
 
   /**
    * Extract requirements from opportunity description using AI
+   * @param opportunity - Opportunity to extract requirements from
+   * @param openaiApiKey - Optional user's OpenAI API key (falls back to platform key)
    */
-  static async extractRequirements(opportunity: Opportunity): Promise<{
+  static async extractRequirements(
+    opportunity: Opportunity,
+    openaiApiKey?: string
+  ): Promise<{
     technicalRequirements: string[];
     certifications: string[];
     experience: string[];
@@ -237,7 +250,7 @@ Score based on:
     }
 
     try {
-      const client = getOpenAIClient();
+      const client = getOpenAIClient(openaiApiKey);
 
       const prompt = `
 Extract key requirements from this government contracting opportunity:

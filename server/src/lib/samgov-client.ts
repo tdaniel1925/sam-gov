@@ -16,6 +16,7 @@ if (!SAM_API_KEY) {
 
 interface RequestOptions extends RequestInit {
   params?: Record<string, string>;
+  apiKey?: string; // Optional: User's API key, falls back to platform key
 }
 
 export class SAMGovAPIError extends Error {
@@ -34,14 +35,17 @@ export async function samRequest<T>(
   endpoint: string,
   options: RequestOptions = {}
 ): Promise<T> {
-  const { params, ...fetchOptions } = options;
+  const { params, apiKey, ...fetchOptions } = options;
 
   // Build URL with query params
   let url = `${SAM_API_URL}${endpoint}`;
 
+  // Use user's API key if provided, otherwise fall back to platform key
+  const keyToUse = apiKey || SAM_API_KEY;
+
   // Add API key to params
   const allParams = {
-    api_key: SAM_API_KEY,
+    api_key: keyToUse,
     ...(params || {}),
   };
 
@@ -49,8 +53,12 @@ export async function samRequest<T>(
   url += `?${searchParams.toString()}`;
 
   // Debug logging
-  console.log('SAM.gov API Request URL:', SAM_API_KEY ? url.replace(SAM_API_KEY, 'API_KEY_HIDDEN') : url);
-  console.log('SAM.gov API Key (first 10 chars):', SAM_API_KEY ? SAM_API_KEY.substring(0, 10) : 'UNDEFINED');
+  console.log('SAM.gov API Request:', {
+    endpoint,
+    usingUserKey: !!apiKey,
+    keySource: apiKey ? 'user' : 'platform',
+    keyPreview: keyToUse ? keyToUse.substring(0, 10) + '...' : 'MISSING'
+  });
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',

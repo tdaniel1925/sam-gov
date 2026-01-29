@@ -10,6 +10,8 @@ import { AISummarizationService } from '../services/ai-summarization-service';
 import { AIScoringService } from '../services/ai-scoring-service';
 import { db } from '../db';
 import { companyProfile } from '../db/schema';
+import { AuthRequest } from '../middleware/auth';
+import { getUserApiKey } from './apiKeys';
 
 const router = Router();
 
@@ -59,7 +61,7 @@ function errorResponse(
 }
 
 // POST /api/search - Advanced search with all filters and optional AI analysis
-router.post('/', async (req: Request, res: Response) => {
+router.post('/', async (req: AuthRequest, res: Response) => {
   try {
     // Validate request body
     const result = searchSchema.safeParse(req.body);
@@ -94,7 +96,23 @@ router.post('/', async (req: Request, res: Response) => {
       withAI,
     } = result.data;
 
-    // Call SAM.gov API with all filters
+    // Fetch user's API keys if authenticated (fallback to platform keys)
+    let userSamKey: string | null = null;
+    let userOpenAIKey: string | null = null;
+
+    if (req.user?.id) {
+      [userSamKey, userOpenAIKey] = await Promise.all([
+        getUserApiKey(req.user.id, 'sam_gov'),
+        getUserApiKey(req.user.id, 'openai'),
+      ]);
+      console.log('🔑 User API keys fetched:', {
+        hasSamKey: !!userSamKey,
+        hasOpenAIKey: !!userOpenAIKey,
+        userId: req.user.id,
+      });
+    }
+
+    // Call SAM.gov API with all filters (uses user key if available, else platform key)
     const searchResults = await SAMGovService.searchOpportunities({
       ncode: naicsCode,
       postedFrom,
@@ -112,7 +130,7 @@ router.post('/', async (req: Request, res: Response) => {
       keywords,
       limit: limit || 20,
       offset: offset || 0,
-    });
+    }, userSamKey || undefined);
 
     // If AI analysis requested, add scoring and summarization
     if (withAI && searchResults.opportunitiesData.length > 0) {
@@ -120,13 +138,13 @@ router.post('/', async (req: Request, res: Response) => {
       const profiles = await db.select().from(companyProfile).limit(1);
       const profile = profiles.length > 0 ? profiles[0] : null;
 
-      // Score and summarize top opportunities
+      // Score and summarize top opportunities (uses user OpenAI key if available)
       const enhancedOpportunities = await Promise.all(
         searchResults.opportunitiesData.slice(0, 10).map(async (opp) => {
           try {
             const [score, summary] = await Promise.all([
-              AIScoringService.scoreOpportunity(opp, profile),
-              AISummarizationService.summarizeOpportunity(opp),
+              AIScoringService.scoreOpportunity(opp, profile, userOpenAIKey || undefined),
+              AISummarizationService.summarizeOpportunity(opp, userOpenAIKey || undefined),
             ]);
 
             return {
@@ -194,12 +212,22 @@ router.get('/debug', async (req: Request, res: Response) => {
 });
 
 // GET /api/search/recent - Get recent opportunities
-router.get('/recent', async (req: Request, res: Response) => {
+router.get('/recent', async (req: AuthRequest, res: Response) => {
   try {
     const naicsCode = req.query.naicsCode as string | undefined;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
 
-    const opportunities = await SAMGovService.getRecentOpportunities(naicsCode, limit);
+    // Fetch user's SAM.gov API key if authenticated
+    let userSamKey: string | null = null;
+    if (req.user?.id) {
+      userSamKey = await getUserApiKey(req.user.id, 'sam_gov');
+    }
+
+    const opportunities = await SAMGovService.getRecentOpportunities(
+      naicsCode,
+      limit,
+      userSamKey || undefined
+    );
 
     return res.json({
       data: opportunities,

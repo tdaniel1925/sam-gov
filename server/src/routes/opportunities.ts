@@ -13,7 +13,8 @@ import { OpportunityMonitor } from '../services/opportunity-monitor';
 import { AIScoringService } from '../services/ai-scoring-service';
 import { AISummarizationService } from '../services/ai-summarization-service';
 import { ProposalGenerationService } from '../services/proposal-generation-service';
-import { requireAuth } from '../middleware/auth';
+import { requireAuth, AuthRequest } from '../middleware/auth';
+import { getUserApiKey } from './apiKeys';
 
 const router = Router();
 
@@ -176,7 +177,7 @@ router.post('/poll', async (req: Request, res: Response) => {
 });
 
 // POST /api/opportunities/score - Score an opportunity using AI
-router.post('/score', async (req: Request, res: Response) => {
+router.post('/score', async (req: AuthRequest, res: Response) => {
   try {
     const opportunity = req.body.opportunity;
 
@@ -193,8 +194,18 @@ router.post('/score', async (req: Request, res: Response) => {
     const profiles = await db.select().from(companyProfile).limit(1);
     const profile = profiles.length > 0 ? profiles[0] : null;
 
-    // Score the opportunity
-    const score = await AIScoringService.scoreOpportunity(opportunity, profile);
+    // Fetch user's OpenAI API key if authenticated
+    let userOpenAIKey: string | null = null;
+    if (req.user?.id) {
+      userOpenAIKey = await getUserApiKey(req.user.id, 'openai');
+    }
+
+    // Score the opportunity (uses user key if available, else platform key)
+    const score = await AIScoringService.scoreOpportunity(
+      opportunity,
+      profile,
+      userOpenAIKey || undefined
+    );
 
     return res.json({
       score,
@@ -221,7 +232,7 @@ router.post('/score', async (req: Request, res: Response) => {
 });
 
 // POST /api/opportunities/summarize - Generate comprehensive AI summary
-router.post('/summarize', async (req: Request, res: Response) => {
+router.post('/summarize', async (req: AuthRequest, res: Response) => {
   try {
     const opportunity = req.body.opportunity;
 
@@ -234,8 +245,17 @@ router.post('/summarize', async (req: Request, res: Response) => {
       );
     }
 
-    // Generate comprehensive summary
-    const summary = await AISummarizationService.summarizeOpportunity(opportunity);
+    // Fetch user's OpenAI API key if authenticated
+    let userOpenAIKey: string | null = null;
+    if (req.user?.id) {
+      userOpenAIKey = await getUserApiKey(req.user.id, 'openai');
+    }
+
+    // Generate comprehensive summary (uses user key if available)
+    const summary = await AISummarizationService.summarizeOpportunity(
+      opportunity,
+      userOpenAIKey || undefined
+    );
 
     return res.json({
       summary,
@@ -262,7 +282,7 @@ router.post('/summarize', async (req: Request, res: Response) => {
 });
 
 // POST /api/opportunities/generate-proposal - Generate proposal outline
-router.post('/generate-proposal', async (req: Request, res: Response) => {
+router.post('/generate-proposal', async (req: AuthRequest, res: Response) => {
   try {
     const { opportunity, summary } = req.body;
 
@@ -288,17 +308,27 @@ router.post('/generate-proposal', async (req: Request, res: Response) => {
       );
     }
 
-    // Generate summary if not provided
-    let opportunitySummary = summary;
-    if (!opportunitySummary) {
-      opportunitySummary = await AISummarizationService.summarizeOpportunity(opportunity);
+    // Fetch user's OpenAI API key if authenticated
+    let userOpenAIKey: string | null = null;
+    if (req.user?.id) {
+      userOpenAIKey = await getUserApiKey(req.user.id, 'openai');
     }
 
-    // Generate proposal outline
+    // Generate summary if not provided (uses user key if available)
+    let opportunitySummary = summary;
+    if (!opportunitySummary) {
+      opportunitySummary = await AISummarizationService.summarizeOpportunity(
+        opportunity,
+        userOpenAIKey || undefined
+      );
+    }
+
+    // Generate proposal outline (uses user key if available)
     const proposalOutline = await ProposalGenerationService.generateProposalOutline(
       opportunity,
       opportunitySummary,
-      profile
+      profile,
+      userOpenAIKey || undefined
     );
 
     return res.json({
@@ -326,7 +356,7 @@ router.post('/generate-proposal', async (req: Request, res: Response) => {
 });
 
 // POST /api/opportunities/compliance-matrix - Generate detailed compliance matrix
-router.post('/compliance-matrix', async (req: Request, res: Response) => {
+router.post('/compliance-matrix', async (req: AuthRequest, res: Response) => {
   try {
     const { opportunityDescription } = req.body;
 
@@ -339,9 +369,16 @@ router.post('/compliance-matrix', async (req: Request, res: Response) => {
       );
     }
 
-    // Generate detailed compliance matrix
+    // Fetch user's OpenAI API key if authenticated
+    let userOpenAIKey: string | null = null;
+    if (req.user?.id) {
+      userOpenAIKey = await getUserApiKey(req.user.id, 'openai');
+    }
+
+    // Generate detailed compliance matrix (uses user key if available)
     const complianceMatrix = await ProposalGenerationService.generateDetailedComplianceMatrix(
-      opportunityDescription
+      opportunityDescription,
+      userOpenAIKey || undefined
     );
 
     return res.json({
