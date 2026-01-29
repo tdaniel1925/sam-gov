@@ -75,10 +75,23 @@ function App() {
   const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
   const isBackendAvailable = import.meta.env.VITE_BACKEND_AVAILABLE !== 'false';
 
+  // Debug logging for deployment verification
+  console.log('🚀 SAM.gov App Loaded - Build 2026-01-29-07:00');
+  console.log('📊 Environment Check:', {
+    isDemoMode,
+    isBackendAvailable,
+    apiUrl: import.meta.env.VITE_API_URL,
+    supabaseUrl: import.meta.env.VITE_SUPABASE_URL
+  });
+
   // If demo mode or no backend, show simple app
   if (isDemoMode || !isBackendAvailable) {
+    console.log('⚠️ DEMO MODE ACTIVE - showing SimpleApp');
     return <SimpleApp />;
   }
+
+  console.log('✅ FULL APP MODE - showing authenticated app');
+
 
   return (
     <AuthProvider>
