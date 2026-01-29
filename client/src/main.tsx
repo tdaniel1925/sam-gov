@@ -1,9 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import ProfessionalApp from './ProfessionalApp.tsx';
+import App from './App.tsx';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <ProfessionalApp />
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
 );
-// Build: 1769664569
+// Build: 1769671440 - Fixed to use App.tsx with environment variable checks
