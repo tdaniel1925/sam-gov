@@ -505,11 +505,15 @@ export default function Dashboard() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Tracked Industries</label>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {profile?.naics_codes?.map(code => (
-                      <span key={code} className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
-                        {code}
-                      </span>
-                    ))}
+                    {profile?.naics_codes && Array.isArray(profile.naics_codes) && profile.naics_codes.length > 0 ? (
+                      profile.naics_codes.map(code => (
+                        <span key={code} className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                          {code}
+                        </span>
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-500">No industries configured</p>
+                    )}
                   </div>
                   <p className="text-sm text-gray-600 mt-2">
                     Contact support to modify your tracked industries
