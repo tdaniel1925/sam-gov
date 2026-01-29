@@ -27,7 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session)
       setUser(session?.user ?? null)
       if (session?.user) {
-        loadUserProfile(session.user.id)
+        loadUserProfile(session.user.id, session.user.email || '')
       }
       setLoading(false)
     })
@@ -39,7 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null)
         
         if (session?.user) {
-          loadUserProfile(session.user.id)
+          loadUserProfile(session.user.id, session.user.email || '')
         } else {
           setProfile(null)
         }
@@ -51,15 +51,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe()
   }, [])
 
-  const loadUserProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
+  const loadUserProfile = async (userId: string, email: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle()
 
-    if (!error && data) {
-      setProfile(data)
+      if (error) {
+        console.error('Profile load error:', error)
+        return
+      }
+
+      if (data) {
+        setProfile(data)
+      } else {
+        // Profile doesn't exist, create it
+        console.log('Creating profile for user:', userId)
+        const { data: newProfile, error: createError } = await supabase
+          .from('user_profiles')
+          .insert({
+            id: userId,
+            email: email,
+            company_name: '',
+            naics_codes: [],
+          })
+          .select()
+          .single()
+
+        if (createError) {
+          console.error('Profile creation error:', createError)
+        } else if (newProfile) {
+          setProfile(newProfile)
+        }
+      }
+    } catch (err) {
+      console.error('Unexpected error loading profile:', err)
     }
   }
 
