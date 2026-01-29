@@ -100,7 +100,13 @@ export class SAMGovService {
         params: queryParams,
       });
     } catch (error) {
-      // If SAM.gov blocks us (403 or 429), fall back to cached data
+      // Log error details for debugging
+      console.error('SAM.gov API Error:', error);
+      if (error instanceof SAMGovAPIError) {
+        console.error('Error details - Status:', error.statusCode, 'Code:', error.code, 'Message:', error.message);
+      }
+
+      // If SAM.gov blocks us (403 or 429) OR any rate limit error, fall back to cached data
       if (error instanceof SAMGovAPIError && (error.statusCode === 403 || error.statusCode === 429)) {
         const reason = error.statusCode === 403 ? 'Forbidden (IP blocked)' : 'Rate limit exceeded';
         console.log(`⚠️  SAM.gov API error (${error.statusCode} ${reason}) - using cached data as fallback`);
@@ -114,6 +120,21 @@ export class SAMGovService {
           ),
         };
       }
+
+      // Also check for rate limit in error message
+      if (error instanceof Error && error.message.toLowerCase().includes('rate limit')) {
+        console.log('⚠️  Rate limit detected in error message - using cached data as fallback');
+        return {
+          totalRecords: cachedData.totalRecords,
+          limit: params.limit || 20,
+          offset: params.offset || 0,
+          opportunitiesData: cachedData.opportunities.slice(
+            params.offset || 0,
+            (params.offset || 0) + (params.limit || 20)
+          ),
+        };
+      }
+
       throw error;
     }
   }
