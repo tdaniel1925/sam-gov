@@ -20,8 +20,12 @@ export default function Dashboard() {
       const result = await response.json()
 
       if (result?.data?.opportunitiesData && Array.isArray(result.data.opportunitiesData)) {
-        setOpportunities(result.data.opportunitiesData.slice(0, 20))
+        const opps = result.data.opportunitiesData.slice(0, 20)
+        console.log(`📊 Loaded ${opps.length} opportunities from API (total: ${result.data.totalRecords})`)
+        console.log('First opportunity:', opps[0])
+        setOpportunities(opps)
       } else {
+        console.error('❌ Invalid API response:', result)
         setOpportunities([])
       }
     } catch (err) {
