@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import ProfessionalAuth from './components/Auth/ProfessionalAuth'
 import AppLayout from './components/Layout/AppLayout'
+import LandingPage from './pages/LandingPage'
 import Dashboard from './pages/Dashboard'
 import AdvancedSearchPage from './pages/AdvancedSearchPage'
 import SavedPage from './pages/SavedPage'
@@ -25,10 +26,32 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) {
-    return <ProfessionalAuth />
+    return <Navigate to="/login" replace />
   }
 
   return <AppLayout>{children}</AppLayout>
+}
+
+function LandingRoute() {
+  const { user, loading } = useAuth()
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // If user is already logged in, redirect to dashboard
+  if (user) {
+    return <Navigate to="/dashboard" replace />
+  }
+
+  return <LandingPage />
 }
 
 function ProfessionalApp() {
@@ -36,7 +59,12 @@ function ProfessionalApp() {
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          {/* Public Routes */}
+          <Route path="/" element={<LandingRoute />} />
+          <Route path="/login" element={<ProfessionalAuth />} />
+          <Route path="/signup" element={<ProfessionalAuth />} />
+
+          {/* Protected Routes */}
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/advanced-search" element={<ProtectedRoute><AdvancedSearchPage /></ProtectedRoute>} />
           <Route path="/opportunity/:id" element={<ProtectedRoute><OpportunityDetailPage /></ProtectedRoute>} />
@@ -44,7 +72,9 @@ function ProfessionalApp() {
           <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
           <Route path="/help" element={<ProtectedRoute><HelpPage /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+
+          {/* Catch all */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </AuthProvider>
