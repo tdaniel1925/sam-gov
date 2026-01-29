@@ -82,6 +82,18 @@ export async function samRequest<T>(
     );
   }
 
+  // Handle forbidden
+  if (response.status === 403) {
+    console.error('SAM.gov API returned 403 Forbidden');
+    console.error('API Key present:', !!SAM_API_KEY);
+    console.error('API Key prefix:', SAM_API_KEY ? SAM_API_KEY.substring(0, 10) : 'UNDEFINED');
+    throw new SAMGovAPIError(
+      'Access forbidden. API key may be invalid, expired, or lack required permissions.',
+      403,
+      'FORBIDDEN'
+    );
+  }
+
   // Handle not found
   if (response.status === 404) {
     throw new SAMGovAPIError(

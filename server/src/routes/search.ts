@@ -181,6 +181,18 @@ router.post('/', async (req: Request, res: Response) => {
   }
 });
 
+// GET /api/search/debug - Debug environment variables (REMOVE IN PRODUCTION)
+router.get('/debug', async (req: Request, res: Response) => {
+  return res.json({
+    sam_api_key_present: !!process.env.SAM_API_KEY,
+    sam_api_key_prefix: process.env.SAM_API_KEY ? process.env.SAM_API_KEY.substring(0, 10) : 'UNDEFINED',
+    sam_api_url: process.env.SAM_API_URL || 'not set',
+    openai_key_present: !!process.env.OPENAI_API_KEY,
+    database_url_present: !!process.env.DATABASE_URL,
+    node_env: process.env.NODE_ENV,
+  });
+});
+
 // GET /api/search/recent - Get recent opportunities
 router.get('/recent', async (req: Request, res: Response) => {
   try {
