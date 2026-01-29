@@ -18,6 +18,12 @@ export default function ComingSoonPage() {
           priority: 'High'
         },
         {
+          title: 'Automated Bid/No-Bid Decision Tool',
+          description: 'AI analyzes opportunities against your capabilities, resources, and win probability to recommend whether to bid or pass, saving time on unwinnable opportunities.',
+          icon: '⚖️',
+          priority: 'High'
+        },
+        {
           title: 'Automated Opportunity Matching',
           description: 'Machine learning algorithm that learns from your behavior and automatically surfaces the most relevant opportunities.',
           icon: '🔍',
@@ -40,6 +46,12 @@ export default function ComingSoonPage() {
           title: 'Proposal Collaboration',
           description: 'Real-time collaborative editing of proposals with version control and comment threads.',
           icon: '📝',
+          priority: 'Medium'
+        },
+        {
+          title: 'Team Capability Gap Analysis',
+          description: 'Identify missing skills and certifications on your team for specific opportunities, with recommendations for training or subcontractor partnerships.',
+          icon: '📊',
           priority: 'Medium'
         },
         {
@@ -81,9 +93,15 @@ export default function ComingSoonPage() {
       status: 'Research Phase',
       features: [
         {
+          title: 'SAM.gov Direct Import',
+          description: 'Automatically import opportunities directly from SAM.gov into your workspace with one click, no manual data entry required.',
+          icon: '🔗',
+          priority: 'High'
+        },
+        {
           title: 'CRM Integration',
           description: 'Sync opportunities directly with Salesforce, HubSpot, or other popular CRM platforms.',
-          icon: '🔗',
+          icon: '🔄',
           priority: 'High'
         },
         {
