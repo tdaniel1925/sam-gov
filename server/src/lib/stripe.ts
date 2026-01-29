@@ -10,19 +10,19 @@ import Stripe from 'stripe';
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 
+// Make Stripe optional - only initialize if key is provided
+export const stripe = STRIPE_SECRET_KEY
+  ? new Stripe(STRIPE_SECRET_KEY, {
+      apiVersion: '2025-12-15.clover',
+      typescript: true,
+    })
+  : null;
+
 if (!STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY environment variable is not set');
+  console.warn('⚠️  STRIPE_SECRET_KEY not set - Stripe features will be disabled');
+} else if (!STRIPE_WEBHOOK_SECRET) {
+  console.warn('⚠️  STRIPE_WEBHOOK_SECRET not set - webhook verification will not work');
 }
-
-if (!STRIPE_WEBHOOK_SECRET) {
-  console.warn('STRIPE_WEBHOOK_SECRET not set - webhook verification will not work');
-}
-
-// Initialize Stripe client
-export const stripe = new Stripe(STRIPE_SECRET_KEY, {
-  apiVersion: '2025-12-15.clover',
-  typescript: true,
-});
 
 // Stripe Price IDs for each plan (these will be created in Stripe Dashboard)
 export const STRIPE_PLANS = {
