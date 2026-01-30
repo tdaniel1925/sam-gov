@@ -33,6 +33,7 @@ import bidDecisionsRoutes from './routes/bid-decisions';
 import capabilityGapsRoutes from './routes/capability-gaps';
 import winRateRoutes from './routes/win-rate';
 import notificationPreferencesRoutes from './routes/notification-preferences';
+import naicsRoutes from './routes/naics';
 import { NotificationJob } from './services/notification-job';
 import { OpportunityMonitor } from './services/opportunity-monitor';
 
@@ -114,6 +115,7 @@ app.use('/api/bid-decisions', bidDecisionsRoutes);
 app.use('/api/capability-gaps', capabilityGapsRoutes);
 app.use('/api/win-rate', winRateRoutes);
 app.use('/api/notification-preferences', notificationPreferencesRoutes);
+app.use('/api/naics', naicsRoutes);
 
 // 404 handler
 app.use((req, res) => {

@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import NAICSBrowser from '../components/NAICSBrowser';
 
 interface SearchFilters {
   postedFrom: string;
@@ -160,16 +161,11 @@ export default function AdvancedSearchPage() {
 
             {/* Core Filters */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  NAICS Code
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g., 541330"
-                  value={filters.naicsCode || ''}
-                  onChange={(e) => setFilters({ ...filters, naicsCode: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              {/* NAICS Browser Component */}
+              <div className="md:col-span-2">
+                <NAICSBrowser
+                  value={filters.naicsCode}
+                  onChange={(code) => setFilters({ ...filters, naicsCode: code })}
                 />
               </div>
 
