@@ -36,13 +36,21 @@ export default function NAICSBrowser({ value, onChange, onSelect }: NAICSBrowser
   const [showDropdown, setShowDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'search' | 'popular' | 'browse'>('popular');
+
+  // Browse Tab State
+  const [sectors, setSectors] = useState<NAICSCode[]>([]);
+  const [expandedCodes, setExpandedCodes] = useState<Set<string>>(new Set());
+  const [childrenMap, setChildrenMap] = useState<Map<string, NAICSCode[]>>(new Map());
+  const [browseLoading, setBrowseLoading] = useState(false);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout>();
 
-  // Load popular codes and recent selections on mount
+  // Load popular codes, recent selections, and sectors on mount
   useEffect(() => {
     loadPopularCodes();
     loadRecentSelections();
+    loadSectors();
   }, []);
 
   // Load NAICS details if value changes
@@ -137,6 +145,48 @@ export default function NAICSBrowser({ value, onChange, onSelect }: NAICSBrowser
     }
   }
 
+  async function loadSectors() {
+    try {
+      const response = await fetch('http://localhost:3001/api/naics/all?level=2');
+      const data = await response.json();
+      setSectors(data.data || []);
+    } catch (error) {
+      console.error('Failed to load sectors:', error);
+    }
+  }
+
+  async function loadChildren(parentCode: string) {
+    // Check if already loaded
+    if (childrenMap.has(parentCode)) {
+      return;
+    }
+
+    try {
+      setBrowseLoading(true);
+      const response = await fetch(`http://localhost:3001/api/naics/children/${parentCode}`);
+      const data = await response.json();
+
+      const newMap = new Map(childrenMap);
+      newMap.set(parentCode, data.data || []);
+      setChildrenMap(newMap);
+    } catch (error) {
+      console.error('Failed to load children:', error);
+    } finally {
+      setBrowseLoading(false);
+    }
+  }
+
+  function toggleExpand(code: string) {
+    const newExpanded = new Set(expandedCodes);
+    if (newExpanded.has(code)) {
+      newExpanded.delete(code);
+    } else {
+      newExpanded.add(code);
+      loadChildren(code);
+    }
+    setExpandedCodes(newExpanded);
+  }
+
   async function loadNAICSDetails(code: string) {
     try {
       const [detailsRes, hierarchyRes] = await Promise.all([
@@ -208,6 +258,70 @@ export default function NAICSBrowser({ value, onChange, onSelect }: NAICSBrowser
         <h4 className="font-semibold text-gray-900 text-sm mb-1">{naics.title}</h4>
         {showFullDetails && (
           <p className="text-xs text-gray-600">{naics.description}</p>
+        )}
+      </div>
+    );
+  }
+
+  function renderTreeNode(naics: NAICSCode, depth: number = 0) {
+    const isExpanded = expandedCodes.has(naics.code);
+    const children = childrenMap.get(naics.code) || [];
+    const hasChildren = naics.level < 6; // All codes except 6-digit can have children
+
+    const levelColors = {
+      2: 'text-blue-600',
+      3: 'text-green-600',
+      4: 'text-yellow-600',
+      5: 'text-orange-600',
+      6: 'text-purple-600',
+    };
+
+    return (
+      <div key={naics.code} className="select-none">
+        <div
+          className="flex items-center gap-2 py-2 px-2 hover:bg-gray-50 rounded cursor-pointer group"
+          style={{ paddingLeft: `${depth * 20 + 8}px` }}
+        >
+          {/* Expand/Collapse Button */}
+          {hasChildren && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleExpand(naics.code);
+              }}
+              className="flex-shrink-0 w-5 h-5 flex items-center justify-center hover:bg-gray-200 rounded"
+            >
+              {isExpanded ? (
+                <FolderOpen size={14} className="text-gray-600" />
+              ) : (
+                <Folder size={14} className="text-gray-600" />
+              )}
+            </button>
+          )}
+          {!hasChildren && <div className="w-5" />}
+
+          {/* Code and Title */}
+          <div
+            onClick={() => handleSelectCode(naics)}
+            className="flex-1 flex items-center gap-2"
+          >
+            <span className={`font-mono text-sm font-bold ${levelColors[naics.level]}`}>
+              {naics.code}
+            </span>
+            <span className="text-sm text-gray-700 group-hover:text-gray-900">
+              {naics.title}
+            </span>
+            {naics.popular && (
+              <Star size={12} className="text-yellow-500 fill-yellow-500" />
+            )}
+          </div>
+        </div>
+
+        {/* Render Children */}
+        {isExpanded && children.length > 0 && (
+          <div className="border-l-2 border-gray-200 ml-2">
+            {children.map(child => renderTreeNode(child, depth + 1))}
+          </div>
         )}
       </div>
     );
@@ -398,16 +512,28 @@ export default function NAICSBrowser({ value, onChange, onSelect }: NAICSBrowser
 
             {activeTab === 'browse' && (
               <div>
-                <div className="mb-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
-                  <p className="text-xs text-gray-600">
-                    Browse all 20 NAICS sectors. Click a sector to see subsectors and detailed codes.
+                <div className="mb-3 bg-blue-50 p-3 rounded-lg border border-blue-200">
+                  <p className="text-xs text-blue-900 flex items-center gap-2">
+                    <Folder size={14} className="flex-shrink-0" />
+                    Browse all 20 NAICS sectors. Click folder icons to expand subsectors and drill down to 6-digit codes. Click any code to select it.
                   </p>
                 </div>
-                <div className="space-y-2">
-                  <div className="text-sm text-gray-500 text-center py-4">
-                    Sector browser coming soon. Use search or popular tabs for now.
+
+                {browseLoading && sectors.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-4">Loading sectors...</p>
+                ) : sectors.length > 0 ? (
+                  <div className="space-y-1">
+                    {sectors.map(sector => renderTreeNode(sector, 0))}
                   </div>
-                </div>
+                ) : (
+                  <p className="text-sm text-gray-500 text-center py-4">No sectors available</p>
+                )}
+
+                {browseLoading && sectors.length > 0 && (
+                  <div className="text-xs text-gray-500 text-center py-2">
+                    Loading...
+                  </div>
+                )}
               </div>
             )}
           </div>
