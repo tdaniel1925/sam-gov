@@ -1,10 +1,11 @@
 // =============================================================================
 // NAICS BROWSER COMPONENT
 // World-class NAICS code selector with autocomplete, hierarchy, and browsing
+// Enhanced with recent selections tracking
 // =============================================================================
 
 import { useState, useEffect, useRef } from 'react';
-import { Search, ChevronRight, Star, X, Info, Folder, FolderOpen } from 'lucide-react';
+import { Search, ChevronRight, Star, X, Info, Folder, FolderOpen, Clock, History } from 'lucide-react';
 
 interface NAICSCode {
   code: string;
@@ -22,10 +23,14 @@ interface NAICSBrowserProps {
   onSelect?: (naics: NAICSCode) => void;
 }
 
+const RECENT_NAICS_KEY = 'naics_recent_selections';
+const MAX_RECENT_ITEMS = 5;
+
 export default function NAICSBrowser({ value, onChange, onSelect }: NAICSBrowserProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<NAICSCode[]>([]);
   const [popularCodes, setPopularCodes] = useState<NAICSCode[]>([]);
+  const [recentCodes, setRecentCodes] = useState<NAICSCode[]>([]);
   const [selectedNAICS, setSelectedNAICS] = useState<NAICSCode | null>(null);
   const [hierarchy, setHierarchy] = useState<NAICSCode[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -34,9 +39,10 @@ export default function NAICSBrowser({ value, onChange, onSelect }: NAICSBrowser
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout>();
 
-  // Load popular codes on mount
+  // Load popular codes and recent selections on mount
   useEffect(() => {
     loadPopularCodes();
+    loadRecentSelections();
   }, []);
 
   // Load NAICS details if value changes
@@ -90,6 +96,34 @@ export default function NAICSBrowser({ value, onChange, onSelect }: NAICSBrowser
     }
   }
 
+  function loadRecentSelections() {
+    try {
+      const stored = localStorage.getItem(RECENT_NAICS_KEY);
+      if (stored) {
+        const recent: NAICSCode[] = JSON.parse(stored);
+        setRecentCodes(recent);
+      }
+    } catch (error) {
+      console.error('Failed to load recent NAICS:', error);
+    }
+  }
+
+  function saveToRecentSelections(naics: NAICSCode) {
+    try {
+      // Remove if already exists (to avoid duplicates)
+      const filtered = recentCodes.filter(r => r.code !== naics.code);
+
+      // Add to front
+      const updated = [naics, ...filtered].slice(0, MAX_RECENT_ITEMS);
+
+      // Save to localStorage
+      localStorage.setItem(RECENT_NAICS_KEY, JSON.stringify(updated));
+      setRecentCodes(updated);
+    } catch (error) {
+      console.error('Failed to save recent NAICS:', error);
+    }
+  }
+
   async function searchNAICS(query: string) {
     try {
       const response = await fetch(`http://localhost:3001/api/naics/search?q=${encodeURIComponent(query)}`);
@@ -130,6 +164,9 @@ export default function NAICSBrowser({ value, onChange, onSelect }: NAICSBrowser
     setShowDropdown(false);
     setSearchQuery('');
     loadNAICSDetails(naics.code);
+
+    // Save to recent selections
+    saveToRecentSelections(naics);
 
     if (onSelect) {
       onSelect(naics);
@@ -292,6 +329,28 @@ export default function NAICSBrowser({ value, onChange, onSelect }: NAICSBrowser
           <div className="p-4 max-h-80 overflow-y-auto">
             {activeTab === 'popular' && (
               <div>
+                {/* Recent Selections Section */}
+                {recentCodes.length > 0 && (
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Clock size={16} className="text-gray-600" />
+                      <h3 className="text-sm font-semibold text-gray-900">Recent Selections</h3>
+                    </div>
+                    <div className="space-y-2">
+                      {recentCodes.map(naics => (
+                        <div key={`recent-${naics.code}`} className="relative">
+                          {renderNAICSCard(naics)}
+                          <div className="absolute top-2 right-2">
+                            <History size={14} className="text-gray-400" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="my-4 border-t border-gray-200"></div>
+                  </div>
+                )}
+
+                {/* Popular Codes Section */}
                 <div className="mb-3 flex items-start gap-2 bg-blue-50 p-3 rounded-lg border border-blue-200">
                   <Info size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
                   <p className="text-xs text-blue-900">
