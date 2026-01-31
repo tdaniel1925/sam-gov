@@ -7,7 +7,7 @@ import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { db } from '../db';
 import { savedOpportunities } from '../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 
 const router = Router();
 
@@ -45,7 +45,7 @@ router.get('/', async (req: Request, res: Response) => {
     const opportunities = await db
       .select()
       .from(savedOpportunities)
-      .orderBy(savedOpportunities.savedAt);
+      .orderBy(desc(savedOpportunities.savedAt));
 
     return res.json({
       data: opportunities,

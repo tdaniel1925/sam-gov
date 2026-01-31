@@ -101,15 +101,20 @@ router.post('/', async (req: AuthRequest, res: Response) => {
     let userOpenAIKey: string | null = null;
 
     if (req.user?.id) {
-      [userSamKey, userOpenAIKey] = await Promise.all([
-        getUserApiKey(req.user.id, 'sam_gov'),
-        getUserApiKey(req.user.id, 'openai'),
-      ]);
-      console.log('🔑 User API keys fetched:', {
-        hasSamKey: !!userSamKey,
-        hasOpenAIKey: !!userOpenAIKey,
-        userId: req.user.id,
-      });
+      try {
+        [userSamKey, userOpenAIKey] = await Promise.all([
+          getUserApiKey(req.user.id, 'sam_gov'),
+          getUserApiKey(req.user.id, 'openai'),
+        ]);
+        console.log('🔑 User API keys fetched:', {
+          hasSamKey: !!userSamKey,
+          hasOpenAIKey: !!userOpenAIKey,
+          userId: req.user.id,
+        });
+      } catch (error) {
+        console.warn('⚠️ Failed to fetch user API keys, using platform keys:', error);
+        // Continue with null keys - will use platform keys
+      }
     }
 
     // Call SAM.gov API with all filters (uses user key if available, else platform key)
@@ -135,8 +140,14 @@ router.post('/', async (req: AuthRequest, res: Response) => {
     // If AI analysis requested, add scoring and summarization
     if (withAI && searchResults.opportunitiesData.length > 0) {
       // Get company profile for scoring
-      const profiles = await db.select().from(companyProfile).limit(1);
-      const profile = profiles.length > 0 ? profiles[0] : null;
+      let profile = null;
+      try {
+        const profiles = await db.select().from(companyProfile).limit(1);
+        profile = profiles.length > 0 ? profiles[0] : null;
+      } catch (error) {
+        console.warn('⚠️ Failed to fetch company profile for AI scoring:', error);
+        // Continue without profile - AI will use generic scoring
+      }
 
       // Score and summarize top opportunities (uses user OpenAI key if available)
       const enhancedOpportunities = await Promise.all(
